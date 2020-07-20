@@ -1,3 +1,9 @@
+# Editors
+.vscode/
+
+# Node packages used for UI development
+node_modules
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
