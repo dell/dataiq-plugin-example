@@ -4,9 +4,8 @@ from dataiq.plugin.plugin import Plugin
 
 
 class Example(Plugin):
-    def __init__(self, auth_override=None, static_folder=None, template_folder=None):
-        super(Example, self).__init__('example', auth_override=auth_override,
-                                      static_folder=static_folder, template_folder=template_folder)
+    def __init__(self, auth_override=None):
+        super(Example, self).__init__('example', auth_override=auth_override)
 
     @property
     def active(self) -> bool:
