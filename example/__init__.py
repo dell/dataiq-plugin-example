@@ -13,7 +13,12 @@ class Example(Plugin):
 
     @property
     def job_manager(self) -> JobManager:
-        pass
+        return None
 
     def plugin_data(self) -> PluginData:
-        pass
+        return PluginData(
+            '',
+            'DateFilter',
+            'DateFilter: The DataIQ Example Plugin',
+            'unknown'
+        )
