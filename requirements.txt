@@ -1,1 +1,2 @@
-dataiq-plugin
+flask
+gunicorn
