@@ -1,7 +1,7 @@
 import React from 'react';
 import Container from '@material-ui/core/Container';
 
-class Main extends React.Component {
+class Config extends React.Component {
   componentDidMount() {
     console.log('Config component mounted');
   }
@@ -15,4 +15,4 @@ class Main extends React.Component {
   }
 }
 
-export default Main;
+export default Config;
