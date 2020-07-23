@@ -1,9 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import HelloWorld from "./HelloWorld";
+import App from "./App";
 
 /**
  * Renders our component into the HTML element with the id "plugin-example-root",
- * defined in example/templates/index.html.
+ * defined in templates/index.html.
  */
-ReactDOM.render(<HelloWorld />, document.getElementById("plugin-example-root"));
+ReactDOM.render(<App />, document.getElementById("plugin-example-root"));

@@ -23,7 +23,7 @@ def hello():
 def execute(context: Context):
     vpath = context[Parameter.VPATH]
     return Response(status=200, mimetype='text/uri-list',
-                    response='../jobs/' + urlsafe_b64encode(vpath))
+                    response='../jobs/' + urlsafe_b64encode(vpath)) # L3BhdGgvdGVzdA for example, as encoded /path/test
 
 
 @app.route('/jobs/<ident>')
@@ -34,7 +34,7 @@ def display(ident):
 @app.route('/bins/', methods=['POST'])
 def bins():
     user = app.require_user()
-    form = request.form
+    form = request.json
     path = form['path']
     depth = form['depth']
 
