@@ -22,13 +22,14 @@ def hello():
 @app.action('/execute/')
 def execute(context: Context):
     vpath = context[Parameter.VPATH]
+    # L3BhdGgvdGVzdA for example, as encoded /path/test, then hits the /jobs/<ident> endpoint below
     return Response(status=200, mimetype='text/uri-list',
-                    response='../jobs/' + urlsafe_b64encode(vpath)) # L3BhdGgvdGVzdA for example, as encoded /path/test
+                    response='../jobs/' + urlsafe_b64encode(vpath))
 
 
 @app.route('/jobs/<ident>')
 def display(ident):
-    return render_template('index.html')
+    return render_template('index.html', path=ident)
 
 
 @app.route('/bins/', methods=['POST'])
