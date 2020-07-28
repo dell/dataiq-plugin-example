@@ -1,3 +1,7 @@
+/**
+ * This is the configuration page of the plugin.
+ */
+
 import React from 'react';
 import Container from '@material-ui/core/Container';
 

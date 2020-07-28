@@ -1,6 +1,17 @@
 {% block app_content %}
-<!-- This is where the UI will be rendered, defined in example/static/scripts/index.js -->
-<div id="plugin-example-root"></div>
+<!--
+  This is where the UI will be rendered, defined in example/static/scripts/index.js.
+
+  We set an HTML data attribute for the path value to pass to our front end UI code.
+  https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes
+
+  Any variables from the Flask back end can be passed to the front end this way, with
+  simillarly named data-<variable> definitions. Use single quotes for proper JSON
+  formatting!
+
+  For this data-path variable, we use it in static/scripts/Main.js on line 105.
+-->
+<div id="plugin-example-root" data-path='{{ path|tojson }}'></div>
 
 <!-- This is where the JavaScript will be loaded, after it is bundled into a single file -->
 <script src="{{ url_for('static', filename='dist/bundle.js') }}"></script>

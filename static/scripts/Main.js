@@ -1,4 +1,10 @@
+/**
+ * This is the main action page of the plugin.
+ */
+
 import React, { useEffect, useState } from 'react';
+import base64 from 'base-64';
+import utf8 from 'utf8';
 
 // Below are all components used from material-ui library to build the UI
 import { Button, Tooltip, CircularProgress } from '@material-ui/core';
@@ -45,6 +51,9 @@ const useStyles = makeStyles((theme) => ({
   loading: {
     textAlign: 'center',
   },
+  error: {
+    textAlign: 'center',
+  },
 }));
 
 function Main() {
@@ -57,6 +66,9 @@ function Main() {
 
   // Store paths data in state. Initial value is an empty array.
   const [paths, setPaths] = useState([]);
+
+  // Store error status in state. Initial value is null.
+  const [error, handleError] = useState(null);
 
   // Store loading status in state. Initial value is true.
   const [isLoading, handleIsLoading] = useState(true);
@@ -73,16 +85,32 @@ function Main() {
   const token = null;
 
   /**
-   * TODO: The path to fetch when the component mounts (when the plugin is first loaded) comes
-   * in the URL. For example, 'L3BhdGgvdGVzdA', decoded from /path/test.
-   */
-  const data = { path: 'test', depth: 2 };
-
-  /**
    * Similar to the componentDidMount lifecycle method: https://reactjs.org/docs/hooks-effect.html.
    * When the component mounts, fetch the bins for the passed in path.
    */
   useEffect(() => {
+    /**
+     * The path to fetch when the component mounts (when the plugin is first loaded) comes
+     * in the URL from the Flask back end.
+     *
+     * In the @app.route('/jobs/<ident>') route in app.py, we set the path value.
+     * In templates/index.html, we then set an HTML data attribute called data-path with this value.
+     * It then can be accessed via the dataset property.
+     *
+     * See https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes for more.
+     *
+     * It comes encoded from the back end, so we must decode it here.
+     * For example, 'L3BhdGgvdGVzdA', decoded from /path/test.
+     */
+    let path = JSON.parse(document.getElementById('plugin-example-root').dataset.path);
+    path = base64.decode(path);
+    path = utf8.decode(path);
+
+    const data = {
+      path,
+      depth: 2,
+    };
+
     fetch('/bins/', {
       method: 'POST',
       headers: {
@@ -94,14 +122,17 @@ function Main() {
       // Format the response into JSON
       .then((response) => response.json())
       .then((data) => {
-        console.log('Success:', data);
         const { paths } = data;
+
+        // Clear error status and message
+        handleError(null);
 
         // Set the `paths` data to use in the UI here, after fetching it
         setPaths(paths);
       })
       .catch((error) => {
-        console.error('Error:', error);
+        // Set error status and message
+        handleError(error);
       })
       .finally(() => {
         // Set loading status after success or failure
@@ -117,23 +148,20 @@ function Main() {
    * https://stackoverflow.com/a/57344801
    */
   const createTreeNodes = (paths) => {
-    const allPaths = paths.map((pathItem) => {
-      return { name: pathItem[0], histogram: pathItem[1] };
-    });
+    const allPaths = paths.map((pathItem) => ({ name: pathItem[0], histogram: pathItem[1] }));
     let result = [];
     let level = { result };
 
     allPaths.forEach((path, id) => {
       // Reduce our array of paths into one tree object
-      path.name.split('/').reduce((accumulator, name) => {
+      path.name.split('/').reduce((accumulator, name, index) => {
         // Check if we've already added this path name
         if (!accumulator[name]) {
           // If not, set this new path name in the tree
           accumulator[name] = { result: [] };
-          // Use the index in our loop as a unique id in the tree
-          accumulator[id] = id;
           accumulator.result.push({
-            id,
+            // Use the two indicies (outer loop and inner reducer) as a unique id in the tree
+            id: `${id}${index}`,
             name,
             histogram: path.histogram,
             children: accumulator[name].result,
@@ -148,7 +176,10 @@ function Main() {
     return result[0];
   };
 
-  // Construct our tree of TreeItem UI components
+  /**
+   * Construct our tree of TreeItem UI components.
+   * https://material-ui.com/api/tree-item/
+   */
   const renderTree = (nodes) => {
     if (!nodes) {
       return null;
@@ -157,8 +188,7 @@ function Main() {
     return (
       <TreeItem
         key={nodes.id}
-        nodeId={String(nodes.id)}
-        // label={nodes.name}
+        nodeId={nodes.id}
         label={
           <div className={classes.labelRoot}>
             <Typography variant="body2" className={classes.labelText}>
@@ -173,7 +203,7 @@ function Main() {
         }
         onLabelClick={() => onLabelClick(nodes.name)}
       >
-        {Array.isArray(nodes.children) ? nodes.children.map((node) => renderTree(node)) : null}
+        {nodes.children.length > 0 ? nodes.children.map((node) => renderTree(node)) : null}
       </TreeItem>
     );
   };
@@ -225,11 +255,16 @@ function Main() {
                 <CircularProgress />
               </div>
             )}
+            {error && (
+              <div className={classes.error}>
+                <Typography variant="body2">{error}</Typography>
+              </div>
+            )}
             <TreeView
               className={classes.tree}
               defaultCollapseIcon={<ExpandMoreIcon />}
               defaultExpandIcon={<ChevronRightIcon />}
-              defaultExpanded={['0']}
+              defaultExpanded={['00']}
             >
               {/* Use the paths value in the state, from earlier fetching, to render the tree */}
               {renderTree(createTreeNodes(paths))}
