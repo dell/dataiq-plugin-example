@@ -7,7 +7,7 @@ import base64 from 'base-64';
 import utf8 from 'utf8';
 
 // Below are all components used from material-ui library to build the UI
-import { Button, Tooltip, CircularProgress } from '@material-ui/core';
+import { Tooltip, CircularProgress } from '@material-ui/core';
 import { KeyboardDatePicker } from '@material-ui/pickers';
 import { makeStyles } from '@material-ui/core/styles';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
@@ -21,13 +21,18 @@ import Typography from '@material-ui/core/Typography';
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
+    paddingBottom: '10px',
+    paddingTop: '10px',
   },
   tree: {
-    paddingLeft: '30%',
-    paddingRight: '30%',
+    paddingLeft: '10%',
+    paddingRight: '10%',
   },
   gridItem: {
     textAlign: 'center',
+  },
+  datePicker: {
+    paddingBottom: '10%',
   },
   button: {
     textTransform: 'none',
@@ -63,6 +68,10 @@ function Main() {
   // Handle date picker changes. Initial value is the current Date.
   const [fromDate, handleFromDateChange] = useState(new Date());
   const [toDate, handleToDateChange] = useState(new Date());
+
+  // Helper functions to format dates consistently
+  const fromDateSeconds = () => Math.floor(new Date(fromDate).getTime() / 1000);
+  const toDateSeconds = () => Math.floor(new Date(toDate).getTime() / 1000);
 
   // Store paths data in state. Initial value is an empty array.
   const [paths, setPaths] = useState([]);
@@ -108,7 +117,7 @@ function Main() {
 
     const data = {
       path,
-      depth: 2,
+      depth: 1,
     };
 
     fetch('/bins/', {
@@ -119,20 +128,35 @@ function Main() {
       },
       body: JSON.stringify(data),
     })
-      // Format the response into JSON
-      .then((response) => response.json())
+      .then((response) => {
+        /**
+         * Handle non-200 responses.
+         * https://developer.mozilla.org/en-US/docs/Web/API/Response/ok
+         */
+        const { ok } = response;
+        if (!ok) {
+          throw new Error(`${response.status}: ${response.statusText}`);
+        }
+
+        // Format response into JSON
+        return response.json();
+      })
+      // Handle JSON-formatted response from previous block
       .then((data) => {
         const { paths } = data;
 
         // Clear error status and message
         handleError(null);
 
-        // Set the `paths` data to use in the UI here, after fetching it
+        // Set the `paths` data to use in the UI, after fetching it
         setPaths(paths);
       })
       .catch((error) => {
-        // Set error status and message
-        handleError(error);
+        console.log({ error });
+
+        // Set a default error message if we cannot pull a message from the error
+        const { message = 'An error occurred. Please try again. If the problem persists, please contact support.' } = error;
+        handleError(message);
       })
       .finally(() => {
         // Set loading status after success or failure
@@ -163,8 +187,18 @@ function Main() {
             // Use the two indicies (outer loop and inner reducer) as a unique id in the tree
             id: `${id}${index}`,
             name,
-            histogram: path.histogram,
+            // histogram: path.histogram,
             children: accumulator[name].result,
+            // The count of items between the "from" and "to" dates
+            count: path.histogram
+              // entry[0] is Unix timestamp in seconds, entry[1] is count
+              .filter((entry) => {
+                return fromDateSeconds() <= entry[0] && entry[0] <= toDateSeconds();
+              })
+              .map((entry) => entry[1])
+              .reduce((accumulator, currentValue) => {
+                return (accumulator += currentValue);
+              }, 0),
           });
         }
 
@@ -196,7 +230,7 @@ function Main() {
             </Typography>
             <Tooltip title="Number of files between the chosen dates" placement="right">
               <Typography variant="caption" color="inherit">
-                {nodes.histogram.length}
+                {nodes.count}
               </Typography>
             </Tooltip>
           </div>
@@ -213,62 +247,56 @@ function Main() {
     <Container>
       <div className={classes.root}>
         <Grid container spacing={3}>
-          <Grid item xs={6} className={classes.gridItem}>
-            <KeyboardDatePicker
-              autoOk
-              variant="inline"
-              inputVariant="outlined"
-              label="From"
-              format="MM/DD/yyyy"
-              value={fromDate}
-              InputAdornmentProps={{ position: 'start' }}
-              onChange={(date) => handleFromDateChange(date)}
-            />
+          <Grid item xs={4} className={classes.gridItem}>
+            <Grid item xs={12} className={classes.datePicker}>
+              <KeyboardDatePicker
+                // autoOk
+                disableFuture
+                variant="inline"
+                inputVariant="outlined"
+                label="From"
+                format="MM/DD/yyyy"
+                value={fromDate}
+                InputAdornmentProps={{ position: 'start' }}
+                onChange={(date) => handleFromDateChange(date)}
+              />
+            </Grid>
+            <Grid item xs={12} className={classes.datePicker}>
+              <KeyboardDatePicker
+                // autoOk
+                disableFuture
+                variant="inline"
+                inputVariant="outlined"
+                label="To"
+                format="MM/DD/yyyy"
+                value={toDate}
+                InputAdornmentProps={{ position: 'start' }}
+                onChange={(date) => handleToDateChange(date)}
+              />
+            </Grid>
           </Grid>
-          <Grid item xs={6} className={classes.gridItem}>
-            <KeyboardDatePicker
-              autoOk
-              variant="inline"
-              inputVariant="outlined"
-              label="To"
-              format="MM/DD/yyyy"
-              value={toDate}
-              InputAdornmentProps={{ position: 'start' }}
-              onChange={(date) => handleToDateChange(date)}
-            />
-          </Grid>
-          <Grid item xs={12} className={classes.gridItem}>
-            <Button
-              className={classes.button}
-              variant="contained"
-              onClick={() => {
-                console.log(`Submit new dates: ${fromDate} to ${toDate}`);
-              }}
-            >
-              Submit
-            </Button>
-          </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={8}>
             {isLoading && (
               <div className={classes.loading}>
                 <Typography variant="body2">Loading...</Typography>
                 <CircularProgress />
               </div>
             )}
-            {error && (
+            {error ? (
               <div className={classes.error}>
                 <Typography variant="body2">{error}</Typography>
               </div>
+            ) : (
+              <TreeView
+                className={classes.tree}
+                defaultCollapseIcon={<ExpandMoreIcon />}
+                defaultExpandIcon={<ChevronRightIcon />}
+                defaultExpanded={['00']}
+              >
+                {/* Use the paths value in the state, from earlier fetching, to render the tree */}
+                {renderTree(createTreeNodes(paths))}
+              </TreeView>
             )}
-            <TreeView
-              className={classes.tree}
-              defaultCollapseIcon={<ExpandMoreIcon />}
-              defaultExpandIcon={<ChevronRightIcon />}
-              defaultExpanded={['00']}
-            >
-              {/* Use the paths value in the state, from earlier fetching, to render the tree */}
-              {renderTree(createTreeNodes(paths))}
-            </TreeView>
           </Grid>
         </Grid>
       </div>
