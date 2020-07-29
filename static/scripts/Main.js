@@ -91,13 +91,18 @@ function Main() {
     fetchBins(data);
   };
 
-  /**
-   * TODO: The token will be passed from IXUI and used here. Will need to implement a listener
-   * to accept the token from IXUI, possibly using the `postMessage` Window API.
-   */
-  const token = null;
+  // Define our API call here to fetch bin data
+  const fetchBins = (data) => {
+    /**
+     * As a plugin, we get the authorization token from DataIQ, the parent window.
+     * If this is running locally in development, parent.token() will not exist
+     */
+    let token = null;
+    if (parent.location.hostname !== '127.0.0.1') {
+      token = parent.token();
+    }
 
-  const fetchBins = (data = {}) => {
+    // Use the Fetch API: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
     fetch('/bins/', {
       method: 'POST',
       headers: {
