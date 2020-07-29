@@ -82,9 +82,13 @@ function Main() {
   // Store loading status in state. Initial value is true.
   const [isLoading, handleIsLoading] = useState(true);
 
-  // TODO: if needed, we can fetch more info for this path when expanding parent folders
-  const onLabelClick = (label) => {
-    console.log(`Clicked ${label}`);
+  // Fetch more info for this path when expanding parent folders
+  const onLabelClick = (path) => {
+    const data = {
+      path,
+      depth: 1,
+    };
+    fetchBins(data);
   };
 
   /**
@@ -93,33 +97,7 @@ function Main() {
    */
   const token = null;
 
-  /**
-   * Similar to the componentDidMount lifecycle method: https://reactjs.org/docs/hooks-effect.html.
-   * When the component mounts, fetch the bins for the passed in path.
-   */
-  useEffect(() => {
-    /**
-     * The path to fetch when the component mounts (when the plugin is first loaded) comes
-     * in the URL from the Flask back end.
-     *
-     * In the @app.route('/jobs/<ident>') route in app.py, we set the path value.
-     * In templates/index.html, we then set an HTML data attribute called data-path with this value.
-     * It then can be accessed via the dataset property.
-     *
-     * See https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes for more.
-     *
-     * It comes encoded from the back end, so we must decode it here.
-     * For example, 'L3BhdGgvdGVzdA', decoded from /path/test.
-     */
-    let path = JSON.parse(document.getElementById('plugin-example-root').dataset.path);
-    path = base64.decode(path);
-    path = utf8.decode(path);
-
-    const data = {
-      path,
-      depth: 1,
-    };
-
+  const fetchBins = (data = {}) => {
     fetch('/bins/', {
       method: 'POST',
       headers: {
@@ -155,13 +133,44 @@ function Main() {
         console.log({ error });
 
         // Set a default error message if we cannot pull a message from the error
-        const { message = 'An error occurred. Please try again. If the problem persists, please contact support.' } = error;
+        const {
+          message = 'An error occurred. Please try again. If the problem persists, please contact support.',
+        } = error;
         handleError(message);
       })
       .finally(() => {
         // Set loading status after success or failure
         handleIsLoading(false);
       });
+  };
+
+  /**
+   * Similar to the componentDidMount lifecycle method: https://reactjs.org/docs/hooks-effect.html.
+   * When the component mounts, fetch the bins for the passed in path.
+   */
+  useEffect(() => {
+    /**
+     * The path to fetch when the component mounts (when the plugin is first loaded) comes
+     * in the URL from the Flask back end.
+     *
+     * In the @app.route('/jobs/<ident>') route in app.py, we set the path value.
+     * In templates/index.html, we then set an HTML data attribute called data-path with this value.
+     * It then can be accessed via the dataset property.
+     *
+     * See https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes for more.
+     *
+     * It comes encoded from the back end, so we must decode it here.
+     * For example, 'L3BhdGgvdGVzdA', decoded from /path/test.
+     */
+    let path = JSON.parse(document.getElementById('plugin-example-root').dataset.path);
+    path = base64.decode(path);
+    path = utf8.decode(path);
+
+    const data = {
+      path,
+      depth: 1,
+    };
+    fetchBins(data);
   }, []);
 
   /**
@@ -186,8 +195,11 @@ function Main() {
           accumulator.result.push({
             // Use the two indicies (outer loop and inner reducer) as a unique id in the tree
             id: `${id}${index}`,
+            // Store the name of this piece
             name,
-            // histogram: path.histogram,
+            // Store the full path of this piece
+            fullPath: path.name,
+            // Store the children paths of this piece
             children: accumulator[name].result,
             // The count of items between the "from" and "to" dates
             count: path.histogram
@@ -235,7 +247,7 @@ function Main() {
             </Tooltip>
           </div>
         }
-        onLabelClick={() => onLabelClick(nodes.name)}
+        onLabelClick={() => onLabelClick(nodes.fullPath)}
       >
         {nodes.children.length > 0 ? nodes.children.map((node) => renderTree(node)) : null}
       </TreeItem>
