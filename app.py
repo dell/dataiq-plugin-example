@@ -7,11 +7,18 @@ from flask import render_template, request, Response
 
 from example import Example
 
+# If provided, authenticate every incoming request as a
+#  root account with the given username.
 AUTH_OVERRIDE = os.getenv('AUTH_OVERRIDE')
 AUTH_OVERRIDE = None if AUTH_OVERRIDE is None else HardcodedAdminUser(AUTH_OVERRIDE)
 
+# Lop off the pod id (last component) from the K8s provided HOSTNAME.
+HOSTNAME = os.getenv('HOSTNAME', 'localhost')
+HOSTNAME = 'localhost' if HOSTNAME == 'localhost' \
+    else '-'.join(HOSTNAME.split('-')[:-1])
 
-app = Example(AUTH_OVERRIDE)
+
+app = Example(HOSTNAME, AUTH_OVERRIDE)
 
 
 @app.route('/hello')
@@ -22,7 +29,8 @@ def hello():
 @app.action('/execute/')
 def execute(context: Context):
     vpath = context[Parameter.VPATH]
-    # L3BhdGgvdGVzdA for example, as encoded /path/test, then hits the /jobs/<ident> endpoint below
+    # L3BhdGgvdGVzdA for example, as encoded /path/test,
+    # then hits the /jobs/<ident> endpoint below
     return Response(status=200, mimetype='text/uri-list',
                     response='../jobs/' + urlsafe_b64encode(vpath))
 
