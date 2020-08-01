@@ -37,9 +37,8 @@ python3.8 -m pip download -d "$DEPS_DIR" -r requirements.txt
 
 
 # Initialize React
-# TODO @Eric J - for example Erik does not know how to get /static/dist/bundle.js in place.
-#  You may assume that the build machine has Node, etc, installed. We just need the commands
-#  to get from a clean repo state (say from a fresh git clone) to ready for use.
+npm --prefix static/ install
+npm --prefix static/ run build
 
 
 tar -czvf "$DIST_DIR/$BUILD_NAME.tar.gz" -C "$BUILD_DIR" "$BUILD_NAME"
