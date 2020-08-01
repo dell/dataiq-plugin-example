@@ -95,7 +95,9 @@ function Main() {
   const fetchBins = (data) => {
     /**
      * As a plugin, we get the authorization token from DataIQ, the parent window.
-     * If this is running locally in development, parent.token() will not exist
+     * If this is running locally in development, parent.token() will not exist.
+     *
+     * TODO: better detect development vs. production, likely using Node environment variables.
      */
     let token = null;
     if (parent.location.hostname !== '127.0.0.1') {
@@ -158,16 +160,12 @@ function Main() {
      * The path to fetch when the component mounts (when the plugin is first loaded) comes
      * in the URL from the Flask back end.
      *
-     * In the @app.route('/jobs/<ident>') route in app.py, we set the path value.
-     * In templates/index.html, we then set an HTML data attribute called data-path with this value.
-     * It then can be accessed via the dataset property.
-     *
-     * See https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes for more.
-     *
      * It comes encoded from the back end, so we must decode it here.
-     * For example, 'L3BhdGgvdGVzdA', decoded from /path/test.
+     * For example, the URL comes as '/jobs/L3BhdGgvdGVzdA'; the encoded piece gets decoded
+     * into "/path/test".
      */
-    let path = JSON.parse(document.getElementById('plugin-example-root').dataset.path);
+    const pathnameParsed = location.pathname.split('/');
+    let path = pathnameParsed[pathnameParsed.length-1];
     path = base64.decode(path);
     path = utf8.decode(path);
 

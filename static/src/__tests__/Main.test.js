@@ -1,34 +1,46 @@
-// Import dependencies
 import React from 'react';
-
-// Import API mocking utilities from Mock Service Worker
-import { rest } from 'msw';
-import { setupServer } from 'msw/node';
-
-// Import react-testing methods
+import ReactDOM from 'react-dom';
+import { act } from 'react-dom/test-utils';
 import { render, fireEvent, waitFor, screen } from '@testing-library/react';
-
-// Import custom Jest matchers from jest-dom for easier testing
 import '@testing-library/jest-dom/extend-expect';
-
-// The component to test
-import Main from '../Main';
-
-// Our Main component relies on this wrapper, as seen in App.py
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import MomentUtils from '@date-io/moment';
+import Main from '../Main';
 
-// document.createElement(<div id="plugin-example-root" data-path="dGVzdC9wYXRoL2hlcmU"></div>);
-JSON.parse = jest.fn().mockImplementationOnce(() => {
-  'dGVzdC9wYXRoL2hlcmU';
+// Mock location and parent token function
+beforeAll(() => {
+  const { location } = window;
+  delete window.location;
+
+  window.location = {
+    hostname: 'test.instance.com',
+    pathname: '/jobs/dGVzdC9wYXRoL2hlcmU',
+  };
+  parent.token = () => {
+    return 'Bearer ' + 'TEST TOKEN';
+  };
 });
 
-test('renders a Main component', () => {
-  screen.debug();
-  const { container, getByText } = render(
+beforeEach(() => {
+  fetch.resetMocks();
+});
+
+afterAll(() => {
+  window.location = location;
+});
+
+test('renders a Main component', async () => {
+  fetch.mockResponseOnce(JSON.stringify({ path: 'dGVzdC9wYXRoL2hlcmU' }));
+
+  render(
     <MuiPickersUtilsProvider utils={MomentUtils}>
       <Main />
     </MuiPickersUtilsProvider>,
   );
-  expect(getByText('This is a configuration page.')).toBeInTheDocument();
+
+  // await waitFor(() => screen.getAllByText('From')[0]);
+  // await waitFor(() => screen.getAllByText('To')[0]);
+
+  expect(screen.getAllByText('From')[0]).toBeInTheDocument();
+  expect(screen.getAllByText('To')[0]).toBeInTheDocument();
 });

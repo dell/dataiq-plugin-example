@@ -5,5 +5,9 @@
     "@babel/preset-env",
     // For compiling JSX (React JavaScript) down to JavaScript.
     "@babel/preset-react"
+  ],
+  "plugins": [
+    // Lets us use async and await (mainly in test files)
+    "@babel/plugin-transform-runtime"
   ]
 }
