@@ -5,7 +5,7 @@ Front end libraries used, from `static/package.json`:
     "@material-ui/icons": MIT,
     "@material-ui/lab": MIT,
     "@material-ui/pickers": MIT,
-    "base-64": MIT,
+    "base64-url": ISC,
     "moment": MIT,
     "react": MIT,
     "react-dom": MIT,

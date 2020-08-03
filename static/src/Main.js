@@ -3,8 +3,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import base64 from 'base-64';
-import utf8 from 'utf8';
+import base64url from 'base64-url';
 
 // Below are all components used from material-ui library to build the UI
 import { Tooltip, CircularProgress } from '@material-ui/core';
@@ -166,9 +165,7 @@ function Main() {
      */
     const pathnameParsed = location.pathname.split('/');
     let path = pathnameParsed[pathnameParsed.length-1];
-    path = path.replace(/-/g, '+').replace(/_/g, '/');
-    path = base64.decode(path);
-    path = utf8.decode(path);
+    path = base64url.decode(base64url.unescape(path));
 
     const data = {
       path,
