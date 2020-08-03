@@ -160,12 +160,13 @@ function Main() {
      * The path to fetch when the component mounts (when the plugin is first loaded) comes
      * in the URL from the Flask back end.
      *
-     * It comes encoded from the back end, so we must decode it here.
+     * It comes as a URL-safe base64 encoded string from the back end, so we must decode it here.
      * For example, the URL comes as '/jobs/L3BhdGgvdGVzdA'; the encoded piece gets decoded
      * into "/path/test".
      */
     const pathnameParsed = location.pathname.split('/');
     let path = pathnameParsed[pathnameParsed.length-1];
+    path = path.replace(/-/g, '+').replace(/_/g, '/');
     path = base64.decode(path);
     path = utf8.decode(path);
 
