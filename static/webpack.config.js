@@ -12,7 +12,7 @@ const path = require('path');
 const config = {
   // Defaults to ./src
   // Here the application starts executing and webpack starts bundling.
-  entry:  path.resolve(__dirname + '/scripts/index.js'), // string | object | array
+  entry:  path.resolve(__dirname + '/src/index.js'), // string | object | array
 
   // Options related to how webpack emits results.
   output: {

@@ -7,7 +7,7 @@ import base64 from 'base-64';
 import utf8 from 'utf8';
 
 // Below are all components used from material-ui library to build the UI
-import { Button, Tooltip, CircularProgress } from '@material-ui/core';
+import { Tooltip, CircularProgress } from '@material-ui/core';
 import { KeyboardDatePicker } from '@material-ui/pickers';
 import { makeStyles } from '@material-ui/core/styles';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
@@ -21,13 +21,18 @@ import Typography from '@material-ui/core/Typography';
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
+    paddingBottom: '10px',
+    paddingTop: '10px',
   },
   tree: {
-    paddingLeft: '30%',
-    paddingRight: '30%',
+    paddingLeft: '10%',
+    paddingRight: '10%',
   },
   gridItem: {
     textAlign: 'center',
+  },
+  datePicker: {
+    paddingBottom: '10%',
   },
   button: {
     textTransform: 'none',
@@ -64,6 +69,10 @@ function Main() {
   const [fromDate, handleFromDateChange] = useState(new Date());
   const [toDate, handleToDateChange] = useState(new Date());
 
+  // Helper functions to format dates consistently
+  const fromDateSeconds = () => Math.floor(new Date(fromDate).getTime() / 1000);
+  const toDateSeconds = () => Math.floor(new Date(toDate).getTime() / 1000);
+
   // Store paths data in state. Initial value is an empty array.
   const [paths, setPaths] = useState([]);
 
@@ -73,16 +82,74 @@ function Main() {
   // Store loading status in state. Initial value is true.
   const [isLoading, handleIsLoading] = useState(true);
 
-  // TODO: if needed, we can fetch more info for this path when expanding parent folders
-  const onLabelClick = (label) => {
-    console.log(`Clicked ${label}`);
+  // Fetch more info for this path when expanding parent folders
+  const onLabelClick = (path) => {
+    const data = {
+      path,
+      depth: 1,
+    };
+    fetchBins(data);
   };
 
-  /**
-   * TODO: The token will be passed from IXUI and used here. Will need to implement a listener
-   * to accept the token from IXUI, possibly using the `postMessage` Window API.
-   */
-  const token = null;
+  // Define our API call here to fetch bin data
+  const fetchBins = (data) => {
+    /**
+     * As a plugin, we get the authorization token from DataIQ, the parent window.
+     * If this is running locally in development, parent.token() will not exist.
+     *
+     * TODO: better detect development vs. production, likely using Node environment variables.
+     */
+    let token = null;
+    if (parent.location.hostname !== '127.0.0.1') {
+      token = parent.token();
+    }
+
+    // Use the Fetch API: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
+    fetch('/bins/', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => {
+        /**
+         * Handle non-200 responses.
+         * https://developer.mozilla.org/en-US/docs/Web/API/Response/ok
+         */
+        const { ok } = response;
+        if (!ok) {
+          throw new Error(`${response.status}: ${response.statusText}`);
+        }
+
+        // Format response into JSON
+        return response.json();
+      })
+      // Handle JSON-formatted response from previous block
+      .then((data) => {
+        const { paths } = data;
+
+        // Clear error status and message
+        handleError(null);
+
+        // Set the `paths` data to use in the UI, after fetching it
+        setPaths(paths);
+      })
+      .catch((error) => {
+        console.log({ error });
+
+        // Set a default error message if we cannot pull a message from the error
+        const {
+          message = 'An error occurred. Please try again. If the problem persists, please contact support.',
+        } = error;
+        handleError(message);
+      })
+      .finally(() => {
+        // Set loading status after success or failure
+        handleIsLoading(false);
+      });
+  };
 
   /**
    * Similar to the componentDidMount lifecycle method: https://reactjs.org/docs/hooks-effect.html.
@@ -93,51 +160,20 @@ function Main() {
      * The path to fetch when the component mounts (when the plugin is first loaded) comes
      * in the URL from the Flask back end.
      *
-     * In the @app.route('/jobs/<ident>') route in app.py, we set the path value.
-     * In templates/index.html, we then set an HTML data attribute called data-path with this value.
-     * It then can be accessed via the dataset property.
-     *
-     * See https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes for more.
-     *
      * It comes encoded from the back end, so we must decode it here.
-     * For example, 'L3BhdGgvdGVzdA', decoded from /path/test.
+     * For example, the URL comes as '/jobs/L3BhdGgvdGVzdA'; the encoded piece gets decoded
+     * into "/path/test".
      */
-    let path = JSON.parse(document.getElementById('plugin-example-root').dataset.path);
+    const pathnameParsed = location.pathname.split('/');
+    let path = pathnameParsed[pathnameParsed.length-1];
     path = base64.decode(path);
     path = utf8.decode(path);
 
     const data = {
       path,
-      depth: 2,
+      depth: 1,
     };
-
-    fetch('/bins/', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-      // Format the response into JSON
-      .then((response) => response.json())
-      .then((data) => {
-        const { paths } = data;
-
-        // Clear error status and message
-        handleError(null);
-
-        // Set the `paths` data to use in the UI here, after fetching it
-        setPaths(paths);
-      })
-      .catch((error) => {
-        // Set error status and message
-        handleError(error);
-      })
-      .finally(() => {
-        // Set loading status after success or failure
-        handleIsLoading(false);
-      });
+    fetchBins(data);
   }, []);
 
   /**
@@ -162,9 +198,22 @@ function Main() {
           accumulator.result.push({
             // Use the two indicies (outer loop and inner reducer) as a unique id in the tree
             id: `${id}${index}`,
+            // Store the name of this piece
             name,
-            histogram: path.histogram,
+            // Store the full path of this piece
+            fullPath: path.name,
+            // Store the children paths of this piece
             children: accumulator[name].result,
+            // The count of items between the "from" and "to" dates
+            count: path.histogram
+              // entry[0] is Unix timestamp in seconds, entry[1] is count
+              .filter((entry) => {
+                return fromDateSeconds() <= entry[0] && entry[0] <= toDateSeconds();
+              })
+              .map((entry) => entry[1])
+              .reduce((accumulator, currentValue) => {
+                return (accumulator += currentValue);
+              }, 0),
           });
         }
 
@@ -196,12 +245,12 @@ function Main() {
             </Typography>
             <Tooltip title="Number of files between the chosen dates" placement="right">
               <Typography variant="caption" color="inherit">
-                {nodes.histogram.length}
+                {nodes.count}
               </Typography>
             </Tooltip>
           </div>
         }
-        onLabelClick={() => onLabelClick(nodes.name)}
+        onLabelClick={() => onLabelClick(nodes.fullPath)}
       >
         {nodes.children.length > 0 ? nodes.children.map((node) => renderTree(node)) : null}
       </TreeItem>
@@ -213,62 +262,56 @@ function Main() {
     <Container>
       <div className={classes.root}>
         <Grid container spacing={3}>
-          <Grid item xs={6} className={classes.gridItem}>
-            <KeyboardDatePicker
-              autoOk
-              variant="inline"
-              inputVariant="outlined"
-              label="From"
-              format="MM/DD/yyyy"
-              value={fromDate}
-              InputAdornmentProps={{ position: 'start' }}
-              onChange={(date) => handleFromDateChange(date)}
-            />
+          <Grid item xs={4} className={classes.gridItem}>
+            <Grid item xs={12} className={classes.datePicker}>
+              <KeyboardDatePicker
+                // autoOk
+                disableFuture
+                variant="inline"
+                inputVariant="outlined"
+                label="From"
+                format="MM/DD/yyyy"
+                value={fromDate}
+                InputAdornmentProps={{ position: 'start' }}
+                onChange={(date) => handleFromDateChange(date)}
+              />
+            </Grid>
+            <Grid item xs={12} className={classes.datePicker}>
+              <KeyboardDatePicker
+                // autoOk
+                disableFuture
+                variant="inline"
+                inputVariant="outlined"
+                label="To"
+                format="MM/DD/yyyy"
+                value={toDate}
+                InputAdornmentProps={{ position: 'start' }}
+                onChange={(date) => handleToDateChange(date)}
+              />
+            </Grid>
           </Grid>
-          <Grid item xs={6} className={classes.gridItem}>
-            <KeyboardDatePicker
-              autoOk
-              variant="inline"
-              inputVariant="outlined"
-              label="To"
-              format="MM/DD/yyyy"
-              value={toDate}
-              InputAdornmentProps={{ position: 'start' }}
-              onChange={(date) => handleToDateChange(date)}
-            />
-          </Grid>
-          <Grid item xs={12} className={classes.gridItem}>
-            <Button
-              className={classes.button}
-              variant="contained"
-              onClick={() => {
-                console.log(`Submit new dates: ${fromDate} to ${toDate}`);
-              }}
-            >
-              Submit
-            </Button>
-          </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={8}>
             {isLoading && (
               <div className={classes.loading}>
                 <Typography variant="body2">Loading...</Typography>
                 <CircularProgress />
               </div>
             )}
-            {error && (
+            {error ? (
               <div className={classes.error}>
                 <Typography variant="body2">{error}</Typography>
               </div>
+            ) : (
+              <TreeView
+                className={classes.tree}
+                defaultCollapseIcon={<ExpandMoreIcon />}
+                defaultExpandIcon={<ChevronRightIcon />}
+                defaultExpanded={['00']}
+              >
+                {/* Use the paths value in the state, from earlier fetching, to render the tree */}
+                {renderTree(createTreeNodes(paths))}
+              </TreeView>
             )}
-            <TreeView
-              className={classes.tree}
-              defaultCollapseIcon={<ExpandMoreIcon />}
-              defaultExpandIcon={<ChevronRightIcon />}
-              defaultExpanded={['00']}
-            >
-              {/* Use the paths value in the state, from earlier fetching, to render the tree */}
-              {renderTree(createTreeNodes(paths))}
-            </TreeView>
           </Grid>
         </Grid>
       </div>

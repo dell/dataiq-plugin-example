@@ -21,11 +21,6 @@ HOSTNAME = 'localhost' if HOSTNAME == 'localhost' \
 app = Example(HOSTNAME, AUTH_OVERRIDE)
 
 
-@app.route('/hello')
-def hello():
-    return 'Hello from Flask'
-
-
 @app.action('/execute/')
 def execute(context: Context):
     vpath = context[Parameter.VPATH]
