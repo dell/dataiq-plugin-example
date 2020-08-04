@@ -3,8 +3,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import base64 from 'base-64';
-import utf8 from 'utf8';
+import base64url from 'base64-url';
 
 // Below are all components used from material-ui library to build the UI
 import { Tooltip, CircularProgress } from '@material-ui/core';
@@ -160,14 +159,13 @@ function Main() {
      * The path to fetch when the component mounts (when the plugin is first loaded) comes
      * in the URL from the Flask back end.
      *
-     * It comes encoded from the back end, so we must decode it here.
+     * It comes as a URL-safe base64 encoded string from the back end, so we must decode it here.
      * For example, the URL comes as '/jobs/L3BhdGgvdGVzdA'; the encoded piece gets decoded
      * into "/path/test".
      */
     const pathnameParsed = location.pathname.split('/');
     let path = pathnameParsed[pathnameParsed.length-1];
-    path = base64.decode(path);
-    path = utf8.decode(path);
+    path = base64url.decode(base64url.unescape(path));
 
     const data = {
       path,

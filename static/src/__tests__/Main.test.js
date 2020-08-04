@@ -38,9 +38,6 @@ test('renders a Main component', async () => {
     </MuiPickersUtilsProvider>,
   );
 
-  // await waitFor(() => screen.getAllByText('From')[0]);
-  // await waitFor(() => screen.getAllByText('To')[0]);
-
   expect(screen.getAllByText('From')[0]).toBeInTheDocument();
   expect(screen.getAllByText('To')[0]).toBeInTheDocument();
 });
