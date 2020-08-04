@@ -16,7 +16,7 @@ from example.bin_provider import DummyBinProvider
 
 
 class Example(Plugin):
-    def __init__(self, hostname, auth_override=None):
+    def __init__(self, plugin_url, auth_override=None):
         super(Example, self).__init__('example', auth_override=auth_override)
         self.configuration = Configuration(
             groups=[],
@@ -38,7 +38,7 @@ class Example(Plugin):
             ]),
             has_visible_settings=True
         )
-        self._hostname = hostname
+        self._plugin_url = plugin_url
 
         self.bin_provider = DummyBinProvider()
         self._job_manager = NoJobsHere()
@@ -53,7 +53,7 @@ class Example(Plugin):
 
     def plugin_data(self) -> PluginData:
         return PluginData(
-            self._hostname,
+            self._plugin_url,
             'DateFilter',
             'DateFilter: The DataIQ Example Plugin',
             'unknown'
