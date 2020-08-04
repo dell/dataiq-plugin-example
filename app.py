@@ -16,9 +16,9 @@ AUTH_OVERRIDE = None if AUTH_OVERRIDE is None else HardcodedAdminUser(AUTH_OVERR
 HOSTNAME = os.getenv('HOSTNAME', 'localhost')
 HOSTNAME = 'localhost' if HOSTNAME == 'localhost' \
     else '-'.join(HOSTNAME.split('-')[:-1])
+PLUGIN_URL = 'http://' + HOSTNAME + ':5000'
 
-
-app = Example(HOSTNAME, AUTH_OVERRIDE)
+app = Example(PLUGIN_URL, AUTH_OVERRIDE)
 
 
 @app.action('/execute/')
