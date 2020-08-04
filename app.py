@@ -24,10 +24,11 @@ app = Example(HOSTNAME, AUTH_OVERRIDE)
 @app.action('/execute/')
 def execute(context: Context):
     vpath = context[Parameter.VPATH]
+    vpath_bytes = bytes(vpath, 'utf-8')
     # L3BhdGgvdGVzdA for example, as encoded /path/test,
     # then hits the /jobs/<ident> endpoint below
     return Response(status=200, mimetype='text/uri-list',
-                    response='../jobs/' + urlsafe_b64encode(vpath))
+                    response=b'../jobs/' + urlsafe_b64encode(vpath_bytes))
 
 
 @app.route('/jobs/<ident>')
