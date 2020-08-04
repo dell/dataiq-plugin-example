@@ -31,7 +31,7 @@ def execute(context: Context):
                     response=b'../jobs/' + urlsafe_b64encode(vpath_bytes))
 
 
-@app.route('/jobs/<ident>')
+@app.route('/jobs/<ident>/')
 def display(ident):
     return render_template('index.html', path=ident)
 

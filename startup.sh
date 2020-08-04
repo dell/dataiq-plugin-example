@@ -27,12 +27,12 @@ export CN_HOSTNAME=claritynow:30080
 
 
 # Install the Python 3 dependencies for the DataIQ libraries, located in /plugin/deps
-python3.8 -m pip install -e /plugin/deps/* --no-index || exit 1
-python3.8 -m pip install -e /plugin/dataiq-plugin -e /plugin/plugin-legacy --no-index || exit 1
+python3.8 -m pip install /plugin/deps/* --no-index || exit 1
+python3.8 -m pip install /plugin/dataiq-plugin /plugin/plugin-legacy --no-index || exit 1
 
 
 # Install the Python 3 dependencies for this plugin.
-python3.8 -m pip install -e /hoststorage/deps/*
+python3.8 -m pip install /hoststorage/deps/*
 
 
 # Begin executing the plugin server.
