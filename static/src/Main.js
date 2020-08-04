@@ -160,11 +160,12 @@ function Main() {
      * in the URL from the Flask back end.
      *
      * It comes as a URL-safe base64 encoded string from the back end, so we must decode it here.
-     * For example, the URL comes as '/jobs/L3BhdGgvdGVzdA'; the encoded piece gets decoded
+     * For example, the URL comes as '/jobs/L3BhdGgvdGVzdA/'; the encoded piece gets decoded
      * into "/path/test".
      */
     const pathnameParsed = location.pathname.split('/');
-    let path = pathnameParsed[pathnameParsed.length-1];
+    // pathnameParsed is ["", "jobs", "<path>", ""]
+    let path = pathnameParsed[2];
     path = base64url.decode(base64url.unescape(path));
 
     const data = {
