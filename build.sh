@@ -8,8 +8,8 @@ fi
 # Setup Build
 VERSION="$1"
 PROJECT_NAME="example-plugin"
-BUILD_DIR="build"
-DIST_DIR="dist"
+BUILD_DIR="$PWD/build"
+DIST_DIR="$PWD/dist"
 
 FILES="LICENSE.md
 README.md
@@ -32,7 +32,7 @@ cp -r $FILES "$BUILD_HOME"
 
 # Pull Dependencies
 DEPS_DIR="$BUILD_HOME/deps"
-mkdir "$DEPS_DIR"
+mkdir -p "$DEPS_DIR"
 python3.8 -m pip download -d "$DEPS_DIR" -r requirements.txt
 
 
@@ -42,4 +42,4 @@ python3.8 -m pip download -d "$DEPS_DIR" -r requirements.txt
 #  to get from a clean repo state (say from a fresh git clone) to ready for use.
 
 
-tar -czvf "$DIST_DIR/$BUILD_NAME.tar.gz" -C "$BUILD_DIR" "$BUILD_NAME"
+cd "$BUILD_HOME" && tar -czvf "$DIST_DIR/$BUILD_NAME.tar.gz" . && cd - 1> /dev/null
