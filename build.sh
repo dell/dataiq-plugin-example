@@ -13,6 +13,7 @@ DIST_DIR="$PWD/dist"
 
 FILES="LICENSE.md
 README.md
+example/
 static/
 templates/
 app.py
