@@ -160,13 +160,15 @@ function Main() {
      * in the URL from the Flask back end.
      *
      * In the @app.route('/jobs/<ident>') route in app.py, we set the path value.
-     * In templates/index.html, we then set an HTML data attribute called data-path with this value.
+     * In templates/index.html, we then set an HTML data attribute called data-path with this
+     * value.
      * It then can be accessed via the dataset property.
      *
      * See https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes for more.
      *
      * It comes as a URL-safe base64 encoded string, so we must decode it here.
-     * For example, 'L3BhdGgvdGVzdA', decoded from /path/test.
+     * For example, the path comes as 'L3BhdGgvdGVzdA'; this encoded piece gets decoded
+     * into "/path/test".
      */
     let path = document.getElementById('plugin-example-root').dataset.path;
     path = base64url.decode(base64url.unescape(path));
