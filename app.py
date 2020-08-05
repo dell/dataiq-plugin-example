@@ -33,6 +33,7 @@ def execute(context: Context):
 
 @app.route('/jobs/<ident>/')
 def display(ident):
+    print(ident)
     return render_template('index.html', path=ident)
 
 
