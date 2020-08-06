@@ -103,8 +103,11 @@ function Main() {
       token = parent.token();
     }
 
-    // Use the Fetch API: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
-    fetch('/bins/', {
+    /**
+     * Use the Fetch API: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API.
+     * This must be a relative path for proper URL parsing when the plugin is running in DataIQ.
+     */
+    fetch('../../bins/', {
       method: 'POST',
       headers: {
         Authorization: token,
@@ -188,9 +191,16 @@ function Main() {
    * https://stackoverflow.com/a/57344801
    */
   const createTreeNodes = (paths) => {
-    const allPaths = paths.map((pathItem) => ({ name: pathItem[0], histogram: pathItem[1] }));
+    console.log({ paths });
+    // Strip leading slash from each path to prevent an empty "root" node of our tree
+    const allPaths = paths.map((pathItem) => ({
+      name: pathItem[0].replace(/^\/+/g, ''),
+      histogram: pathItem[1],
+    }));
     let result = [];
     let level = { result };
+
+    console.log({ allPaths });
 
     allPaths.forEach((path, id) => {
       // Reduce our array of paths into one tree object
@@ -210,11 +220,10 @@ function Main() {
             children: accumulator[name].result,
             // The count of items between the "from" and "to" dates
             count: path.histogram
-              // entry[0] is Unix timestamp in seconds, entry[1] is count
               .filter((entry) => {
-                return fromDateSeconds() <= entry[0] && entry[0] <= toDateSeconds();
+                return fromDateSeconds() <= entry.latest && entry.latest <= toDateSeconds();
               })
-              .map((entry) => entry[1])
+              .map((entry) => entry.count)
               .reduce((accumulator, currentValue) => {
                 return (accumulator += currentValue);
               }, 0),
