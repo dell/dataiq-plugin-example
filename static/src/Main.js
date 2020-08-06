@@ -191,7 +191,6 @@ function Main() {
    * https://stackoverflow.com/a/57344801
    */
   const createTreeNodes = (paths) => {
-    console.log({ paths });
     // Strip leading slash from each path to prevent an empty "root" node of our tree
     const allPaths = paths.map((pathItem) => ({
       name: pathItem[0].replace(/^\/+/g, ''),
@@ -199,8 +198,6 @@ function Main() {
     }));
     let result = [];
     let level = { result };
-
-    console.log({ allPaths });
 
     allPaths.forEach((path, id) => {
       // Reduce our array of paths into one tree object
