@@ -36,6 +36,11 @@ def display(ident):
     return render_template('index.html', path=ident)
 
 
+@app.route('/configuration/')
+def config():
+    return render_template('index.html')
+
+
 @app.route('/bins/', methods=['POST'])
 def bins():
     user = app.require_user()
