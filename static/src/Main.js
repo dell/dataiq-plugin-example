@@ -4,11 +4,11 @@
 
 import React, { useEffect, useState } from 'react';
 import base64url from 'base64-url';
+import MomentUtils from '@date-io/moment';
 
 // Below are all components used from material-ui library to build the UI
 import { Tooltip, CircularProgress } from '@material-ui/core';
-import { KeyboardDatePicker } from '@material-ui/pickers';
-import { makeStyles } from '@material-ui/core/styles';
+import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import Container from '@material-ui/core/Container';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -16,53 +16,11 @@ import Grid from '@material-ui/core/Grid';
 import TreeView from '@material-ui/lab/TreeView';
 import TreeItem from '@material-ui/lab/TreeItem';
 import Typography from '@material-ui/core/Typography';
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-    paddingBottom: '10px',
-    paddingTop: '10px',
-  },
-  tree: {
-    paddingLeft: '10%',
-    paddingRight: '10%',
-  },
-  gridItem: {
-    textAlign: 'center',
-  },
-  datePicker: {
-    paddingBottom: '10%',
-  },
-  button: {
-    textTransform: 'none',
-  },
-  label: {
-    fontWeight: 'inherit',
-    color: 'inherit',
-  },
-  labelRoot: {
-    display: 'flex',
-    alignItems: 'center',
-    padding: theme.spacing(0.5, 0),
-  },
-  labelIcon: {
-    marginRight: theme.spacing(1),
-  },
-  labelText: {
-    fontWeight: 'inherit',
-    flexGrow: 1,
-  },
-  loading: {
-    textAlign: 'center',
-  },
-  error: {
-    textAlign: 'center',
-  },
-}));
+import styles from './styles';
 
 function Main() {
   // Use material-ui's styling functionality
-  const classes = useStyles();
+  const classes = styles();
 
   // Handle date picker changes. Initial value is the current Date.
   const [fromDate, handleFromDateChange] = useState(new Date());
@@ -269,63 +227,65 @@ function Main() {
 
   // Return the UI for our main page
   return (
-    <Container>
-      <div className={classes.root}>
-        <Grid container spacing={3}>
-          <Grid item xs={4} className={classes.gridItem}>
-            <Grid item xs={12} className={classes.datePicker}>
-              <KeyboardDatePicker
-                // autoOk
-                disableFuture
-                variant="inline"
-                inputVariant="outlined"
-                label="From"
-                format="MM/DD/yyyy"
-                value={fromDate}
-                InputAdornmentProps={{ position: 'start' }}
-                onChange={(date) => handleFromDateChange(date)}
-              />
+    <MuiPickersUtilsProvider utils={MomentUtils}>
+      <Container>
+        <div className={classes.root}>
+          <Grid container spacing={3}>
+            <Grid item xs={4} className={classes.gridItem}>
+              <Grid item xs={12} className={classes.datePicker}>
+                <KeyboardDatePicker
+                  // autoOk
+                  disableFuture
+                  variant="inline"
+                  inputVariant="outlined"
+                  label="From"
+                  format="MM/DD/yyyy"
+                  value={fromDate}
+                  InputAdornmentProps={{ position: 'start' }}
+                  onChange={(date) => handleFromDateChange(date)}
+                />
+              </Grid>
+              <Grid item xs={12} className={classes.datePicker}>
+                <KeyboardDatePicker
+                  // autoOk
+                  disableFuture
+                  variant="inline"
+                  inputVariant="outlined"
+                  label="To"
+                  format="MM/DD/yyyy"
+                  value={toDate}
+                  InputAdornmentProps={{ position: 'start' }}
+                  onChange={(date) => handleToDateChange(date)}
+                />
+              </Grid>
             </Grid>
-            <Grid item xs={12} className={classes.datePicker}>
-              <KeyboardDatePicker
-                // autoOk
-                disableFuture
-                variant="inline"
-                inputVariant="outlined"
-                label="To"
-                format="MM/DD/yyyy"
-                value={toDate}
-                InputAdornmentProps={{ position: 'start' }}
-                onChange={(date) => handleToDateChange(date)}
-              />
+            <Grid item xs={8}>
+              {isLoading && (
+                <div className={classes.loading}>
+                  <Typography variant="body2">Loading...</Typography>
+                  <CircularProgress />
+                </div>
+              )}
+              {error ? (
+                <div className={classes.error}>
+                  <Typography variant="body2">{error}</Typography>
+                </div>
+              ) : (
+                <TreeView
+                  className={classes.tree}
+                  defaultCollapseIcon={<ExpandMoreIcon />}
+                  defaultExpandIcon={<ChevronRightIcon />}
+                  defaultExpanded={['00']}
+                >
+                  {/* Use the paths value in the state, from earlier fetching, to render the tree */}
+                  {renderTree(createTreeNodes(paths))}
+                </TreeView>
+              )}
             </Grid>
           </Grid>
-          <Grid item xs={8}>
-            {isLoading && (
-              <div className={classes.loading}>
-                <Typography variant="body2">Loading...</Typography>
-                <CircularProgress />
-              </div>
-            )}
-            {error ? (
-              <div className={classes.error}>
-                <Typography variant="body2">{error}</Typography>
-              </div>
-            ) : (
-              <TreeView
-                className={classes.tree}
-                defaultCollapseIcon={<ExpandMoreIcon />}
-                defaultExpandIcon={<ChevronRightIcon />}
-                defaultExpanded={['00']}
-              >
-                {/* Use the paths value in the state, from earlier fetching, to render the tree */}
-                {renderTree(createTreeNodes(paths))}
-              </TreeView>
-            )}
-          </Grid>
-        </Grid>
-      </div>
-    </Container>
+        </div>
+      </Container>
+    </MuiPickersUtilsProvider>
   );
 }
 

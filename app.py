@@ -33,12 +33,7 @@ def execute(context: Context):
 
 @app.route('/jobs/<ident>/')
 def display(ident):
-    return render_template('index.html', path=ident)
-
-
-@app.route('/configuration/')
-def config():
-    return render_template('index.html')
+    return render_template('index.html', bundle='../../static/dist/bundle.js', page='main', path=ident)
 
 
 @app.route('/bins/', methods=['POST'])

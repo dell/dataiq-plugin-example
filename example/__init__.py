@@ -10,7 +10,7 @@ from dataiq.plugin.invalidator.clarity_now import PluginData
 from dataiq.plugin.jobs import JobManager, JobFactory, Job
 from dataiq.plugin.plugin import Plugin
 from dataiq.plugin.util.enum import EnumSet
-from flask import Response
+from flask import render_template, Response
 
 from example.bin_provider import DummyBinProvider
 
@@ -60,7 +60,7 @@ class Example(Plugin):
         )
 
     def settings(self) -> Union[str, Response]:
-        pass
+        return render_template('index.html', bundle='../static/dist/bundle.js', page='settings')
 
 
 class NoJobsHere(JobManager):
