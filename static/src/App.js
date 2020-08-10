@@ -15,7 +15,8 @@ function App() {
 
   /**
    * Similar to the componentDidMount lifecycle method: https://reactjs.org/docs/hooks-effect.html.
-   * When the component mounts, parse which page to show which is  passed to us from Flask.
+   * When the component mounts, parse which page to show. The 'page' data attribute is passed to us
+   * from Flask.
    */
   useEffect(() => {
     setPage(document.getElementById('plugin-example-root').dataset.page);

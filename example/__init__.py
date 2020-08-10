@@ -60,6 +60,8 @@ class Example(Plugin):
         )
 
     def settings(self) -> Union[str, Response]:
+        # TODO: if running locally, change below to be ../../
+        # Find a better way to handle the need to change this if running locally.
         return render_template('index.html', bundle='../static/dist/bundle.js', page='settings')
 
 
