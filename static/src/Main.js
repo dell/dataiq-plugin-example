@@ -88,13 +88,14 @@ function Main() {
       })
       // Handle JSON-formatted response from previous block
       .then((data) => {
-        const { paths } = data;
+        // Store new paths from response data
+        const { paths: newPaths } = data;
 
         // Clear error status and message
         handleError(null);
 
-        // Set the `paths` data to use in the UI, after fetching it
-        setPaths(paths);
+        // Combine the existing path data with the new path data after fetching it
+        setPaths([...paths, ...newPaths]);
       })
       .catch((error) => {
         console.log({ error });
