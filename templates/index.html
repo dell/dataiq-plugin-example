@@ -17,17 +17,15 @@
       example/static/src/index.js.
 
       We set an HTML data attribute for the path value to pass to our front end UI code.
+      We also set an HTML data attribute to indicate the page to show in the UI.
       https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes
 
       Any variables from the Flask back end can be passed to the front end this way, with
-      simillarly named data-<variable> definitions. Use single quotes for proper JSON
-      formatting!
-
-      For this data-path variable, we use it in static/src/Main.js on line 173.
+      simillarly named data-<variable> definitions.
     -->
-    <div id="plugin-example-root" data-path="{{ path }}"></div>
+    <div id="plugin-example-root" data-path="{{ path }}" data-page="{{ page }}"></div>
     <!-- This is where the JavaScript will be loaded, after it is bundled into a single file -->
-    <script src="../../static/dist/bundle.js"></script>
+    <script src="{{ bundle }}"></script>
   </body>
 </html>
 {% endblock %}

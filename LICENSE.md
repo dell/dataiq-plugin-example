@@ -9,4 +9,3 @@ Front end libraries used, from `static/package.json`:
     "moment": MIT,
     "react": MIT,
     "react-dom": MIT,
-    "utf8": MIT

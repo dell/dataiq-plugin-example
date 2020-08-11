@@ -1,24 +1,40 @@
 // Main entry point for the UI
-import React from 'react';
-import { MuiPickersUtilsProvider } from '@material-ui/pickers'
-import MomentUtils from '@date-io/moment';
+import React, { useEffect, useState } from 'react';
+import { CircularProgress } from '@material-ui/core';
+import Typography from '@material-ui/core/Typography';
 
+import styles from './styles';
 import Main from './Main';
+import Settings from './Settings';
 
-class App extends React.Component {
-  componentDidMount() {
-    document.title = 'Plugin Example';
-  }
+function App() {
+  const classes = styles();
 
-  render() {
-    return (
-      // Tell all date pickers to use moment.js library
-      <MuiPickersUtilsProvider utils={MomentUtils}>
-        {/* The Main component is the "action" page of the plugin */}
-        <Main />
-      </MuiPickersUtilsProvider>
-    );
-  }
+  // Declare a state variable 'page', a function 'setPage', and a default value of 'null'
+  const [page, setPage] = useState(null);
+
+  /**
+   * Similar to the componentDidMount lifecycle method: https://reactjs.org/docs/hooks-effect.html.
+   * When the component mounts, parse which page to show. The 'page' data attribute is passed to us
+   * from Flask.
+   */
+  useEffect(() => {
+    setPage(document.getElementById('plugin-example-root').dataset.page);
+  }, []);
+
+  return (
+    // Set the appropriate UI component based on the page requested in the back end
+    <React.Fragment>
+      {page === 'main' && <Main />}
+      {page === 'settings' && <Settings />}
+      {page === null && (
+        <div className={classes.loading}>
+          <Typography variant="body2">Loading...</Typography>
+          <CircularProgress />
+        </div>
+      )}
+    </React.Fragment>
+  );
 }
 
 export default App;

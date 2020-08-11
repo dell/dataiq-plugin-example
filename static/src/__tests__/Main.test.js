@@ -1,21 +1,14 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import { act } from 'react-dom/test-utils';
-import { render, fireEvent, waitFor, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import MomentUtils from '@date-io/moment';
 import Main from '../Main';
 
-// Mock location and parent token function
+// Mock document and parent token function
+let spy;
 beforeAll(() => {
-  const { location } = window;
-  delete window.location;
-
-  window.location = {
-    hostname: 'test.instance.com',
-    pathname: '/jobs/dGVzdC9wYXRoL2hlcmU',
-  };
+  spy = jest.spyOn(document, 'getElementById');
   parent.token = () => {
     return 'Bearer ' + 'TEST TOKEN';
   };
@@ -25,18 +18,20 @@ beforeEach(() => {
   fetch.resetMocks();
 });
 
-afterAll(() => {
-  window.location = location;
-});
-
 test('renders a Main component', async () => {
-  fetch.mockResponseOnce(JSON.stringify({ path: 'dGVzdC9wYXRoL2hlcmU' }));
+  let mockElement;
+  mockElement = document.createElement('div');
+  mockElement.setAttribute('id', 'plugin-example-root');
+  mockElement.dataset.path = 'dGVzdC9wYXRoL2hlcmU';
+  spy.mockReturnValue(mockElement);
 
   render(
     <MuiPickersUtilsProvider utils={MomentUtils}>
       <Main />
     </MuiPickersUtilsProvider>,
   );
+
+  fetch.mockResponseOnce(JSON.stringify({ path: 'dGVzdC9wYXRoL2hlcmU' }));
 
   expect(screen.getAllByText('From')[0]).toBeInTheDocument();
   expect(screen.getAllByText('To')[0]).toBeInTheDocument();
