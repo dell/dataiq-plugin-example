@@ -16,7 +16,6 @@ DIST_DIR="$PWD/dist"
 FILES="LICENSE.md
 README.md
 example/
-static/
 templates/
 app.py
 startup.sh"
@@ -42,6 +41,8 @@ python3.8 -m pip download -d "$DEPS_DIR" -r requirements.txt
 # Initialize React
 npm --prefix static/ install
 npm --prefix static/ run build
+mkdir -p "$BUILD_HOME/static/dist"
+cp "static/dist/bundle.js" "$BUILD_HOME/static/dist/bundle.js"
 
 
 cd "$BUILD_HOME" && tar -czvf "$DIST_DIR/$BUILD_NAME.tar.gz" . && cd - 1> /dev/null
