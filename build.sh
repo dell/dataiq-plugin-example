@@ -5,6 +5,8 @@ if [ "$#" == "0" ]; then
   exit 1
 fi
 
+set -e -x
+
 # Setup Build
 VERSION="$1"
 PROJECT_NAME="example-plugin"

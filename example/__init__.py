@@ -45,7 +45,17 @@ class Example(Plugin):
 
     @property
     def active(self) -> bool:
-        return True
+        try:
+            with open('status.txt', 'r') as fp:
+                contents = fp.read()
+        except FileNotFoundError:
+            return False
+        return contents == 'active'
+
+    @active.setter
+    def active(self, enable):
+        with open('status.txt', 'w+') as fp:
+            fp.write('active' if enable else 'inactive')
 
     @property
     def job_manager(self) -> JobManager:
