@@ -11,11 +11,15 @@ import Settings from './Settings';
 function App() {
   const classes = styles();
 
+  // Check the theme set in DataIQ. Use it for our plugin theme initially.
+  const dataIQTheme = localStorage.getItem('theme');
+
   /**
-   * Declare a state variable 'theme', a function 'setTheme', and a default value of 'false'.
+   * Declare a state variable 'theme', a function 'setTheme', and a default value whatever
+   * DataIQ's theme is set to.
    * Used for toggling light/dark theme.
    */
-  const [theme, setTheme] = useState(false);
+  const [theme, setTheme] = useState(dataIQTheme === 'day' ? true : false);
 
   // Set our applied theme based on the theme value
   const appliedTheme = createMuiTheme(theme ? light : dark);
