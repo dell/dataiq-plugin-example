@@ -230,12 +230,11 @@ function Main() {
   return (
     <MuiPickersUtilsProvider utils={MomentUtils}>
       <Container>
-        <div className={classes.root}>
+        <React.Fragment>
           <Grid container spacing={3}>
             <Grid item xs={4} className={classes.gridItem}>
               <Grid item xs={12} className={classes.datePicker}>
                 <KeyboardDatePicker
-                  // autoOk
                   disableFuture
                   variant="inline"
                   inputVariant="outlined"
@@ -248,7 +247,6 @@ function Main() {
               </Grid>
               <Grid item xs={12} className={classes.datePicker}>
                 <KeyboardDatePicker
-                  // autoOk
                   disableFuture
                   variant="inline"
                   inputVariant="outlined"
@@ -284,7 +282,7 @@ function Main() {
               )}
             </Grid>
           </Grid>
-        </div>
+        </React.Fragment>
       </Container>
     </MuiPickersUtilsProvider>
   );
