@@ -1,10 +1,30 @@
 import { makeStyles } from '@material-ui/core/styles';
 
+/**
+ * Use material UI's built-in "palettes" for easy light/dark theming. It can be expanded or
+ * customized if needed.
+ *
+ * https://material-ui.com/customization/palette/#dark-mode
+ */
+export const light = {
+  palette: {
+    type: "light"
+  }
+};
+
+export const dark = {
+  palette: {
+    type: "dark"
+  }
+};
+
 const styles = makeStyles((theme) => ({
   root: {
-    flexGrow: 1,
-    paddingBottom: '10px',
-    paddingTop: '10px',
+    height: '100vh',
+  },
+  appContainer: {
+    width: '100%',
+    height: '100%',
   },
   tree: {
     paddingLeft: '10%',
