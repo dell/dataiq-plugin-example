@@ -8,14 +8,21 @@ import { makeStyles } from '@material-ui/core/styles';
  */
 export const light = {
   palette: {
-    type: "light"
-  }
+    type: 'light',
+  },
 };
+
+/**
+ * In DataIQ, the theme values used for toggling are the strings 'day' and 'night', using the key of 'theme'.
+ * We only have to care about 'day' for now; if it's not 'day', use 'night' (dark) theme.
+ */
+export const DATAIQ_THEME_KEY = 'theme';
+export const DATAIQ_DAY_THEME_VALUE = 'day';
 
 export const dark = {
   palette: {
-    type: "dark"
-  }
+    type: 'dark',
+  },
 };
 
 const styles = makeStyles((theme) => ({
@@ -23,8 +30,7 @@ const styles = makeStyles((theme) => ({
     height: '100vh',
   },
   appContainer: {
-    width: '100%',
-    height: '100%',
+    paddingTop: '20px',
   },
   tree: {
     paddingLeft: '10%',
