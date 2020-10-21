@@ -16,7 +16,7 @@ function App() {
    * DataIQ's theme is set to.
    * Used for toggling light/dark theme.
    */
-  const dataIQTheme = localStorage.getItem('theme');
+  const dataIQTheme = localStorage.getItem(DATAIQ_THEME_KEY);
   const [theme, setTheme] = useState(dataIQTheme === DATAIQ_DAY_THEME_VALUE ? true : false);
 
   // Set our applied theme based on the theme value
