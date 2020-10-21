@@ -3,7 +3,7 @@ from base64 import urlsafe_b64encode
 
 from dataiq.plugin.context import Context, Parameter
 from dataiq.plugin.user import HardcodedAdminUser
-from flask import render_template, request, Response
+from flask import render_template, request, Response, send_from_directory
 
 from example import Example
 
@@ -53,6 +53,11 @@ def bins():
     return {
         'paths': files
     }
+
+
+@app.route('/internal/settings/static/<path:resource>')
+def settings_static(resource):
+    return send_from_directory('../static', resource)
 
 
 if __name__ == '__main__':
