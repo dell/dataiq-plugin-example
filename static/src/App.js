@@ -1,6 +1,13 @@
 // Main entry point for the UI
 import React, { useEffect, useState } from 'react';
-import { AppBar, CircularProgress, CssBaseline, FormControlLabel, Switch, Toolbar } from '@material-ui/core';
+import {
+  AppBar,
+  CircularProgress,
+  CssBaseline,
+  FormControlLabel,
+  Switch,
+  Toolbar,
+} from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
@@ -69,9 +76,7 @@ function App() {
         <CssBaseline />
         {/* This provides a toolbar area at the top of the plugin window for each page */}
         <AppBar position="static" color="default">
-          <Toolbar>
-            {themeToggleButton}
-          </Toolbar>
+          <Toolbar>{themeToggleButton}</Toolbar>
         </AppBar>
         <div className={classes.appContainer}>
           {/* Set the appropriate UI component based on the page requested in the back end */}
