@@ -26,6 +26,16 @@
     <div id="plugin-example-root" data-path="{{ path }}" data-page="{{ page }}"></div>
     <!-- This is where the JavaScript will be loaded, after it is bundled into a single file -->
     <script src="{{ bundle }}"></script>
+    <!-- Resize and center the plugin window -->
+    <script>
+      window.onload = function () {
+        const width = 800;
+        const height = 600;
+        // Resizes and moves the parent of our plugin window, which is the wrapper code from DataIQ
+        window.parent.resizeTo(width, height);
+        window.parent.moveTo((screen.width - width) / 2, (screen.height - height) / 2);
+      };
+    </script>
   </body>
 </html>
 {% endblock %}
