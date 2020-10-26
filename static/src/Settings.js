@@ -4,19 +4,19 @@
 
 import React from 'react';
 import Container from '@material-ui/core/Container';
+import { Typography } from '@material-ui/core';
 
-class Settings extends React.Component {
-  componentDidMount() {
-    console.log('Settings component mounted');
-  }
-
-  render() {
-    return (
-      <Container>
-        This is a settings page.
-      </Container>
-    )
-  }
+function Settings() {
+  return (
+    <Container>
+      <Typography variant="h4" gutterBottom>
+        Settings
+      </Typography>
+      <Typography variant="body1" gutterBottom>
+        Settings for your plugin can be defined here.
+      </Typography>
+    </Container>
+  );
 }
 
 export default Settings;

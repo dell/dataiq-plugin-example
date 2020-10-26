@@ -5,5 +5,5 @@ import Settings from '../Settings';
 
 test('renders a Settings component', () => {
   const { getByText } = render(<Settings />);
-  expect(getByText('This is a settings page.')).toBeInTheDocument();
+  expect(getByText('Settings for your plugin can be defined here.')).toBeInTheDocument();
 });
