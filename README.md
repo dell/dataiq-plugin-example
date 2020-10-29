@@ -20,7 +20,7 @@ The UI file is now ready to be served by the back end server.
 
 ### Run the back end server
 
-1. Run the back end server from the `app.py` file. **[TODO: ADD DETAILS HERE]**
+1. Run the back end server from the `app.py` file.
 2. The server will listen at `127.0.0.1:5000`.
 3. Looking at the routes defined in `app.py`, see that `render_template` is defined in the `/jobs/<ident>` route.
 4. Going to `/127.0.0.1:5000/jobs/dGVzdC9wYXRoL2hlcmU`, for example, will show the front end UI.

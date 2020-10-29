@@ -150,17 +150,35 @@ function Main() {
    * https://stackoverflow.com/a/57344801
    */
   const createTreeNodes = (paths) => {
-    // Strip leading slash from each path to prevent an empty "root" node of our tree
     const allPaths = paths.map((pathItem) => ({
-      name: pathItem[0].replace(/^\/+/g, ''),
+      name: pathItem[0],
       histogram: pathItem[1],
     }));
+
     let result = [];
     let level = { result };
+    let pathArray = null;
 
     allPaths.forEach((path, id) => {
+      // Handle root path
+      if (path.name === '/') {
+        pathArray = ['/'];
+      }
+      // Handle non-root paths
+      else {
+        pathArray = path.name.split('/');
+
+        /**
+         * Handle child paths of root. `/childA` when split becomes ['', 'childA'],
+         * but we still want to treat the `/` part as an actual path in our tree.
+         */
+        if (pathArray[0] === '') {
+          pathArray[0] = '/';
+        }
+      }
+
       // Reduce our array of paths into one tree object
-      path.name.split('/').reduce((accumulator, name, index) => {
+      pathArray.reduce((accumulator, name, index) => {
         // Check if we've already added this path name
         if (!accumulator[name]) {
           // If not, set this new path name in the tree
@@ -230,59 +248,57 @@ function Main() {
   return (
     <MuiPickersUtilsProvider utils={MomentUtils}>
       <Container>
-        <React.Fragment>
-          <Grid container spacing={3}>
-            <Grid item xs={4} className={classes.gridItem}>
-              <Grid item xs={12} className={classes.datePicker}>
-                <KeyboardDatePicker
-                  disableFuture
-                  variant="inline"
-                  inputVariant="outlined"
-                  label="From"
-                  format="MM/DD/yyyy"
-                  value={fromDate}
-                  InputAdornmentProps={{ position: 'start' }}
-                  onChange={(date) => handleFromDateChange(date)}
-                />
-              </Grid>
-              <Grid item xs={12} className={classes.datePicker}>
-                <KeyboardDatePicker
-                  disableFuture
-                  variant="inline"
-                  inputVariant="outlined"
-                  label="To"
-                  format="MM/DD/yyyy"
-                  value={toDate}
-                  InputAdornmentProps={{ position: 'start' }}
-                  onChange={(date) => handleToDateChange(date)}
-                />
-              </Grid>
+        <Grid container spacing={3}>
+          <Grid item xs={4} className={classes.gridItem}>
+            <Grid item xs={12} className={classes.datePicker}>
+              <KeyboardDatePicker
+                disableFuture
+                variant="inline"
+                inputVariant="outlined"
+                label="From"
+                format="MM/DD/yyyy"
+                value={fromDate}
+                InputAdornmentProps={{ position: 'start' }}
+                onChange={(date) => handleFromDateChange(date)}
+              />
             </Grid>
-            <Grid item xs={8}>
-              {isLoading && (
-                <div className={classes.loading}>
-                  <Typography variant="body2">Loading...</Typography>
-                  <CircularProgress />
-                </div>
-              )}
-              {error ? (
-                <div className={classes.error}>
-                  <Typography variant="body2">{error}</Typography>
-                </div>
-              ) : (
-                <TreeView
-                  className={classes.tree}
-                  defaultCollapseIcon={<ExpandMoreIcon />}
-                  defaultExpandIcon={<ChevronRightIcon />}
-                  defaultExpanded={['00']}
-                >
-                  {/* Use the paths value in the state, from earlier fetching, to render the tree */}
-                  {renderTree(createTreeNodes(paths))}
-                </TreeView>
-              )}
+            <Grid item xs={12} className={classes.datePicker}>
+              <KeyboardDatePicker
+                disableFuture
+                variant="inline"
+                inputVariant="outlined"
+                label="To"
+                format="MM/DD/yyyy"
+                value={toDate}
+                InputAdornmentProps={{ position: 'start' }}
+                onChange={(date) => handleToDateChange(date)}
+              />
             </Grid>
           </Grid>
-        </React.Fragment>
+          <Grid item xs={8}>
+            {isLoading && (
+              <div className={classes.loading}>
+                <Typography variant="body2">Loading...</Typography>
+                <CircularProgress />
+              </div>
+            )}
+            {error ? (
+              <div className={classes.error}>
+                <Typography variant="body2">{error}</Typography>
+              </div>
+            ) : (
+              <TreeView
+                className={classes.tree}
+                defaultCollapseIcon={<ExpandMoreIcon />}
+                defaultExpandIcon={<ChevronRightIcon />}
+                defaultExpanded={['00']}
+              >
+                {/* Use the paths value in the state, from earlier fetching, to render the tree */}
+                {renderTree(createTreeNodes(paths))}
+              </TreeView>
+            )}
+          </Grid>
+        </Grid>
       </Container>
     </MuiPickersUtilsProvider>
   );
