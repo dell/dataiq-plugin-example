@@ -48,11 +48,14 @@ def bins():
     except ValueError:
         return 'depth must be an integer', 400
 
-    files = list(app.bin_provider.bins_for(user, path, depth))
-
-    return {
-        'paths': files
-    }
+    # files must be a list or iterator of (path, [[date, count]...])
+    try:
+        bins_list = app.bin_provider.bins_for(user, path, depth)
+    except Exception as e:
+        return str(e), 400
+    if not isinstance(bins_list, list):
+        bins_list = list(bins_list)
+    return {'paths': bins_list}
 
 
 @app.route('/internal/settings/static/<path:resource>')

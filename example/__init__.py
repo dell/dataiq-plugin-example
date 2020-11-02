@@ -12,7 +12,7 @@ from dataiq.plugin.plugin import Plugin
 from dataiq.plugin.util.enum import EnumSet
 from flask import render_template, Response
 
-from example.bin_provider import DummyBinProvider
+from example.bin_provider import DummyBinProvider, ClarityNowApiBinProvider
 
 
 class Example(Plugin):
@@ -40,7 +40,7 @@ class Example(Plugin):
         )
         self._plugin_url = plugin_url
 
-        self.bin_provider = DummyBinProvider()
+        self.bin_provider = ClarityNowApiBinProvider()
         self._job_manager = NoJobsHere()
 
     @property
