@@ -1,7 +1,9 @@
+// Copyright 2020 Dell Inc, or its subsidiaries.
+// SPDX-License-Identifier: Apache-2.0
+
 /**
  * This is the settings page of the plugin.
  */
-
 import React from 'react';
 import Container from '@material-ui/core/Container';
 import { Typography } from '@material-ui/core';

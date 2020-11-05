@@ -1,7 +1,9 @@
+// Copyright 2020 Dell Inc, or its subsidiaries.
+// SPDX-License-Identifier: Apache-2.0
+
 /**
  * This is the main action page of the plugin.
  */
-
 import React, { useEffect, useState } from 'react';
 import base64url from 'base64-url';
 import MomentUtils from '@date-io/moment';

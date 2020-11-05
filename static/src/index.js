@@ -1,3 +1,6 @@
+// Copyright 2020 Dell Inc, or its subsidiaries.
+// SPDX-License-Identifier: Apache-2.0
+
 import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";

@@ -1,3 +1,6 @@
+// Copyright 2020 Dell Inc, or its subsidiaries.
+// SPDX-License-Identifier: Apache-2.0
+
 // This is ESLint's configuration file. See https://eslint.org/docs/user-guide/configuring
 {
     "env": {

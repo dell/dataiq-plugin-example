@@ -1,3 +1,6 @@
+// Copyright 2020 Dell Inc, or its subsidiaries.
+// SPDX-License-Identifier: Apache-2.0
+
 /**
  * This is Webpack's configuration file. See https://webpack.js.org/configuration/.
  *

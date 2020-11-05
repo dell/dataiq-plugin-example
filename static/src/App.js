@@ -1,3 +1,6 @@
+// Copyright 2020 Dell Inc, or its subsidiaries.
+// SPDX-License-Identifier: Apache-2.0
+
 // Main entry point for the UI
 import React, { useEffect, useState } from 'react';
 import {
