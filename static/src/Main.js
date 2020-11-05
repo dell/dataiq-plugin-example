@@ -5,6 +5,7 @@
 import React, { useEffect, useState } from 'react';
 import base64url from 'base64-url';
 import MomentUtils from '@date-io/moment';
+import moment from 'moment';
 
 // Below are all components used from material-ui library to build the UI
 import { Tooltip, CircularProgress } from '@material-ui/core';
@@ -29,6 +30,7 @@ function Main() {
   // Helper functions to format dates consistently
   const fromDateSeconds = () => Math.floor(new Date(fromDate).getTime() / 1000);
   const toDateSeconds = () => Math.floor(new Date(toDate).getTime() / 1000);
+  const getEpochSeconds = (date) => moment.utc(date, 'YYYY-MM-DD').valueOf() / 1000;
 
   // Store paths data in state. Initial value is an empty array.
   const [paths, setPaths] = useState([]);
@@ -47,6 +49,13 @@ function Main() {
     };
     fetchBins(data);
   };
+
+  // Only can show file count for children of the path we've passed in
+  const showCount = (nodes) => {
+    const pathArray = nodes.fullPath.split('/');
+    // See if this node's name is the end of the full path, indicating it's a child node
+    return pathArray[pathArray.length - 1] === nodes.name;
+  }
 
   // Define our API call here to fetch bin data
   const fetchBins = (data) => {
@@ -151,34 +160,16 @@ function Main() {
    */
   const createTreeNodes = (paths) => {
     const allPaths = paths.map((pathItem) => ({
-      name: pathItem[0],
-      histogram: pathItem[1],
+      fullPath: pathItem.path,
+      histogram: pathItem.bins,
     }));
 
     let result = [];
     let level = { result };
-    let pathArray = null;
 
     allPaths.forEach((path, id) => {
-      // Handle root path
-      if (path.name === '/') {
-        pathArray = ['/'];
-      }
-      // Handle non-root paths
-      else {
-        pathArray = path.name.split('/');
-
-        /**
-         * Handle child paths of root. `/childA` when split becomes ['', 'childA'],
-         * but we still want to treat the `/` part as an actual path in our tree.
-         */
-        if (pathArray[0] === '') {
-          pathArray[0] = '/';
-        }
-      }
-
       // Reduce our array of paths into one tree object
-      pathArray.reduce((accumulator, name, index) => {
+      path.fullPath.split('/').reduce((accumulator, name, index) => {
         // Check if we've already added this path name
         if (!accumulator[name]) {
           // If not, set this new path name in the tree
@@ -189,15 +180,20 @@ function Main() {
             // Store the name of this piece
             name,
             // Store the full path of this piece
-            fullPath: path.name,
+            fullPath: path.fullPath,
             // Store the children paths of this piece
             children: accumulator[name].result,
             // The count of items between the "from" and "to" dates
             count: path.histogram
               .filter((entry) => {
-                return fromDateSeconds() <= entry.latest && entry.latest <= toDateSeconds();
+                // The "date" value is stored in entry[0], formatted as yyyy-MM-dd
+                return (
+                  fromDateSeconds() <= getEpochSeconds(entry[0]) &&
+                  getEpochSeconds(entry[0]) <= toDateSeconds()
+                );
               })
-              .map((entry) => entry.count)
+              // The "count" value is stored in entry[1]
+              .map((entry) => entry[1])
               .reduce((accumulator, currentValue) => {
                 return (accumulator += currentValue);
               }, 0),
@@ -230,11 +226,13 @@ function Main() {
             <Typography variant="body2" className={classes.labelText}>
               {nodes.name}
             </Typography>
-            <Tooltip title="Number of files between the chosen dates" placement="right">
-              <Typography variant="caption" color="inherit">
-                {nodes.count}
-              </Typography>
-            </Tooltip>
+            {showCount(nodes) && (
+              <Tooltip title="Number of files modified between the two dates" placement="right">
+                <Typography variant="caption" color="inherit">
+                  {nodes.count}
+                </Typography>
+              </Tooltip>
+            )}
           </div>
         }
         onLabelClick={() => onLabelClick(nodes.fullPath)}
