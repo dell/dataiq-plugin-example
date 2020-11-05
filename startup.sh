@@ -1,5 +1,6 @@
-# Copyright © 2016-2020 Dell Inc. or its subsidiaries.
-# All Rights Reserved.
+# Copyright 2020 Dell Inc, or its subsidiaries.
+#
+# SPDX-License-Identifier: Apache-2.0
 
 set -x
 

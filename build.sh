@@ -1,3 +1,7 @@
+# Copyright 2020 Dell Inc, or its subsidiaries.
+#
+# SPDX-License-Identifier: Apache-2.0
+
 USAGE="Usage: $0 <version>"
 
 if [ "$#" == "0" ]; then
