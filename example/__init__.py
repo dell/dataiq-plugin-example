@@ -12,7 +12,7 @@ from dataiq.plugin.plugin import Plugin
 from dataiq.plugin.util.enum import EnumSet
 from flask import render_template, Response
 
-from example.bin_provider import DummyBinProvider
+from example.bin_provider import DummyBinProvider, ClarityNowApiBinProvider
 
 
 class Example(Plugin):
@@ -32,7 +32,10 @@ class Example(Plugin):
                         applies_to=EnumSet.of(AppliesTo.FOLDERS),
                         volume_types=EnumSet.all_of(VolumeTypes),
                         max_selections=1,
-                        path_regex=None
+                        # Do not run the Example Plugin on the root path (/)
+                        # because ClarityNow does not have bin information
+                        # for the root path.
+                        path_regex='/[^/]+.+'
                     )
                 )
             ]),
@@ -40,7 +43,7 @@ class Example(Plugin):
         )
         self._plugin_url = plugin_url
 
-        self.bin_provider = DummyBinProvider()
+        self.bin_provider = ClarityNowApiBinProvider()
         self._job_manager = NoJobsHere()
 
     @property
