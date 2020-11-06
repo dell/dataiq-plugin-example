@@ -18,7 +18,8 @@ README.md
 example/
 templates/
 app.py
-startup.sh"
+startup.sh
+version"
 
 
 # Start Build

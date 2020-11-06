@@ -63,5 +63,12 @@ def settings_static(resource):
     return send_from_directory('../static', resource)
 
 
+@app.route('/version/')
+def version():
+    with app.open_resource('../version') as f:
+        contents = f.read()
+        return contents
+
+
 if __name__ == '__main__':
     app.run()
