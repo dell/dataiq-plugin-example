@@ -1,6 +1,13 @@
 import { makeStyles } from '@material-ui/core/styles';
 
 /**
+ * In DataIQ, the theme values used for toggling are the strings 'day' and 'night', using the key of 'theme'.
+ * We only have to care about 'day' for now; if it's not 'day', use 'night' (dark) theme.
+ */
+export const DATAIQ_THEME_KEY = 'theme';
+export const DATAIQ_DAY_THEME_VALUE = 'day';
+
+/**
  * Use material UI's built-in "palettes" for easy light/dark theming. It can be expanded or
  * customized if needed.
  *
@@ -9,19 +16,20 @@ import { makeStyles } from '@material-ui/core/styles';
 export const light = {
   palette: {
     type: 'light',
+    primary: {
+      // This color matches the blue color in DataIQ's "day" theme
+      main: '#0076ce',
+    },
   },
 };
-
-/**
- * In DataIQ, the theme values used for toggling are the strings 'day' and 'night', using the key of 'theme'.
- * We only have to care about 'day' for now; if it's not 'day', use 'night' (dark) theme.
- */
-export const DATAIQ_THEME_KEY = 'theme';
-export const DATAIQ_DAY_THEME_VALUE = 'day';
 
 export const dark = {
   palette: {
     type: 'dark',
+    primary: {
+      // This color matches the blue color in DataIQ's "night" theme
+      main: '#53b4c4',
+    },
   },
 };
 
