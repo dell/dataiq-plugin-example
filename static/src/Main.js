@@ -20,6 +20,7 @@ import TreeView from '@material-ui/lab/TreeView';
 import TreeItem from '@material-ui/lab/TreeItem';
 import Typography from '@material-ui/core/Typography';
 import styles from './styles';
+import { getToken } from '.';
 
 function Main() {
   // Use material-ui's styling functionality
@@ -62,24 +63,13 @@ function Main() {
   // Define our API call here to fetch bin data
   const fetchBins = (data) => {
     /**
-     * As a plugin, we get the authorization token from DataIQ, the parent window.
-     * If this is running locally in development, parent.token() will not exist.
-     *
-     * TODO: better detect development vs. production, likely using Node environment variables.
-     */
-    let token = null;
-    if (parent.location.hostname !== '127.0.0.1') {
-      token = parent.token();
-    }
-
-    /**
      * Use the Fetch API: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API.
      * This must be a relative path for proper URL parsing when the plugin is running in DataIQ.
      */
     fetch('../../bins/', {
       method: 'POST',
       headers: {
-        Authorization: token,
+        Authorization: getToken(),
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),

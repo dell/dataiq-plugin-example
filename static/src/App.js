@@ -5,6 +5,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   AppBar,
+  Box,
   CircularProgress,
   CssBaseline,
   FormControlLabel,
@@ -17,6 +18,7 @@ import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import styles, { light, dark, DATAIQ_THEME_KEY, DATAIQ_DAY_THEME_VALUE } from './styles';
 import Main from './Main';
 import Settings from './Settings';
+import { getToken } from '.';
 
 function App() {
   const classes = styles();
@@ -58,6 +60,48 @@ function App() {
   };
 
   /**
+   * Declare a state variable 'version', a function 'setVersion', and a default value of ''.
+   * Used for fetching the version of the plugin via the back end.
+   */
+  const [version, setVersion] = useState('');
+  useEffect(() => {
+    // Fetch the version from the back end
+    fetch('../../version/', {
+      method: 'GET',
+      headers: {
+        Authorization: getToken(),
+        'Content-Type': 'text/plain',
+      },
+    })
+      .then((response) => {
+        const { ok } = response;
+        if (!ok) {
+          throw new Error('Error fetching plugin version.');
+        }
+        return response.text();
+      })
+      // If the fetch was successful, set the version string
+      .then((data) => setVersion(data))
+      // If the fetch was unsuccessful or an error otherwise occurred, set an error string
+      .catch((error) => {
+        const { message } = error;
+        setVersion(message);
+      });
+  }, []);
+
+  // Component to display the plugin version string
+  const versionString = (
+    <Box flexGrow={1}>
+      <Typography display="inline" variant="body1">
+        Version:
+      </Typography>
+      <Box fontSize="body1.fontSize" ml={1} display="inline" fontFamily="Monospace">
+        {version}
+      </Box>
+    </Box>
+  );
+
+  /**
    * Declare a state variable 'page', a function 'setPage', and a default value of 'null'.
    * Used for determining which page to show in the UI.
    */
@@ -79,7 +123,10 @@ function App() {
         <CssBaseline />
         {/* This provides a toolbar area at the top of the plugin window for each page */}
         <AppBar position="static" color="default">
-          <Toolbar>{themeToggleButton}</Toolbar>
+          <Toolbar>
+            {versionString}
+            {themeToggleButton}
+          </Toolbar>
         </AppBar>
         <div className={classes.appContainer}>
           {/* Set the appropriate UI component based on the page requested in the back end */}
