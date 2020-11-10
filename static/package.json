@@ -27,7 +27,7 @@
     "url": "https://eos2git.cec.lab.emc.com/Clarity360/plugin-example"
   },
   "author": "Eric Jackson",
-  "license": "SEE LICENSE IN LICENSE.md",
+  "license": "Apache-2.0",
   "browserslist": "> 0.25%, not dead",
   "devDependencies": {
     "@babel/core": "^7.10.5",

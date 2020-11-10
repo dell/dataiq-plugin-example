@@ -53,12 +53,11 @@ function Main() {
     fetchBins(data);
   };
 
-  // Only can show file count for children of the path we've passed in
-  const showCount = (nodes) => {
-    const pathArray = nodes.fullPath.split('/');
-    // See if this node's name is the end of the full path, indicating it's a child node
-    return pathArray[pathArray.length - 1] === nodes.name;
-  }
+  /**
+   * We do not yet roll-up the binning count to a parent folder, so if this is a parent node,
+   * do not show the count. Otherwise the numbers would appear to not add up correctly.
+   */
+  const showCount = (nodes) => nodes.children.length === 0;
 
   // Define our API call here to fetch bin data
   const fetchBins = (data) => {
@@ -150,18 +149,24 @@ function Main() {
    * https://material-ui.com/components/tree-view/#rich-object
    * https://stackoverflow.com/a/57344801
    */
-  const createTreeNodes = (paths) => {
-    const allPaths = paths.map((pathItem) => ({
-      fullPath: pathItem.path,
-      histogram: pathItem.bins,
-    }));
-
+  const createTreeNodes = (data) => {
     let result = [];
     let level = { result };
 
-    allPaths.forEach((path, id) => {
+    data.forEach((item, id) => {
       // Reduce our array of paths into one tree object
-      path.fullPath.split('/').reduce((accumulator, name, index) => {
+      const pathArray = item.path.split('/');
+      pathArray.reduce((accumulator, name, index) => {
+        /**
+         * Create parent path so we can form the full path of this piece.
+         * Used for fetching child bin info of parent paths.
+         */
+        let parent = '';
+        for (let i = 0; i < index; i++) {
+          parent += pathArray[i] + '/';
+        }
+        const fullPath = parent + name;
+
         // Check if we've already added this path name
         if (!accumulator[name]) {
           // If not, set this new path name in the tree
@@ -169,14 +174,14 @@ function Main() {
           accumulator.result.push({
             // Use the two indicies (outer loop and inner reducer) as a unique id in the tree
             id: `${id}${index}`,
-            // Store the name of this piece
-            name,
-            // Store the full path of this piece
-            fullPath: path.fullPath,
+            // Store the name of this piece. Use '/' for root path.
+            name: name === '' ? '/' : name,
+            // Store the full path of this piece. Use '/' for root path.
+            fullPath: fullPath === '' ? '/' : fullPath,
             // Store the children paths of this piece
             children: accumulator[name].result,
             // The count of items between the "from" and "to" dates
-            count: path.histogram
+            count: item.bins
               .filter((entry) => {
                 // The "date" value is stored in entry[0], formatted as yyyy-MM-dd
                 return (
@@ -227,7 +232,8 @@ function Main() {
             )}
           </div>
         }
-        onLabelClick={() => onLabelClick(nodes.fullPath)}
+        // Fetching bin information for the root path is not supported
+        onLabelClick={() => (nodes.fullPath === '/' ? null : onLabelClick(nodes.fullPath))}
       >
         {nodes.children.length > 0 ? nodes.children.map((node) => renderTree(node)) : null}
       </TreeItem>
