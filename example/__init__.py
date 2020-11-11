@@ -52,6 +52,7 @@ class Example(Plugin):
         if os.environ.get('LOCAL_DEV') is None:
             self.bin_provider = ClarityNowApiBinProvider()
         else:
+            print('LOCAL_DEV environment variable is set. Using dummy data source.')
             self.bin_provider = DummyBinProvider()
         self._job_manager = NoJobsHere()
 
