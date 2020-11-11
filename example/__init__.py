@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import os
 from typing import Union, Any, Iterator
 
 from dataiq.plugin.action import Action
@@ -47,7 +48,11 @@ class Example(Plugin):
         )
         self._plugin_url = plugin_url
 
-        self.bin_provider = ClarityNowApiBinProvider()
+        # If LOCAL_DEV environment variable is not set, use ClarityNow API
+        if os.environ.get('LOCAL_DEV') is None:
+            self.bin_provider = ClarityNowApiBinProvider()
+        else:
+            self.bin_provider = DummyBinProvider()
         self._job_manager = NoJobsHere()
 
     @property
