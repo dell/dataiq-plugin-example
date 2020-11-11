@@ -14,11 +14,13 @@ from dateutil.relativedelta import relativedelta
 
 from dataiq.plugin.user import User
 
-try:
-    import claritynowapi
-except ImportError:
-    sys.path.append('/usr/local/claritynow/scripts/python')
-    import claritynowapi
+# If LOCAL_DEV environment variable is not set, use ClarityNow API
+if os.environ.get('LOCAL_DEV') is None:
+    try:
+        import claritynowapi
+    except ImportError:
+        sys.path.append('/usr/local/claritynow/scripts/python')
+        import claritynowapi
 
 Bin = namedtuple('Bin', 'latest count')
 
@@ -57,10 +59,12 @@ class DummyBinProvider(BinProvider):
         with open(DummyBinProvider.CSV_SOURCE) as fp:
             for relative, count in csv.reader(fp):
                 then = now - eval(relative, {'delta': relativedelta}) - epoch
-                self.histogram.append(Bin(int(then.total_seconds()), int(count)))
+                self.histogram.append(Bin(datetime.datetime.fromtimestamp(
+                    then.total_seconds()).strftime('%Y-%m-%d'), int(count)))
 
     def bins_for(self, user: User, path: str, depth: int):
-        yield path, self.histogram
+        # 'path' and 'bins' are the keys ClarityNow uses for respective values
+        yield {'path': path, 'bins': self.histogram}
         if depth > 0:
             for c in self.children:
                 yield from self.bins_for(user, os.path.join(path, c), depth-1)
