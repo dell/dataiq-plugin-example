@@ -17,7 +17,7 @@ PROJECT_NAME="example-plugin"
 BUILD_DIR="$PWD/build"
 DIST_DIR="$PWD/dist"
 
-FILES="LICENSE.md
+FILES="LICENSE
 README.md
 example/
 templates/
