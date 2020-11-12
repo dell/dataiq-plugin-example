@@ -4,15 +4,42 @@ This example plugin uses a Python/[Flask](https://flask.palletsprojects.com/) ba
 
 ## Overview
 
-The plugin defines two pages: a main page and a settings page. They are React components that use the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) to retrieve data from the back end Flask server.
+The plugin defines two pages: a main page and a settings page.
+They are React components that use the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) to
+retrieve data from the back end Flask server.
 
-The main page fetches ClarityNow binning information for a given path and displays the count of files in each bin in the UI. The UI provides two date picker components to filter bin information based on the two selected dates.
+The main page fetches ClarityNow binning information for a given path and displays the count of files in each bin in the UI.
+The UI provides two date picker components to filter bin information based on the two selected dates.
 
-The settings page shows placeholder text, but provides a page where a developer can define whatever settings they deem necessary. Examples include rich HTML controls (checkboxes, radio buttons, toggles) or a text area with a configuration file that was loaded from the back end which can be edited and saved.
+The settings page shows placeholder text, but provides a page where a developer can define whatever settings they deem necessary.
+Examples include rich HTML controls (checkboxes, radio buttons, toggles) or a text area with a configuration file that
+was loaded from the back end which can be edited and saved.
+
+## Installation
+
+You can find a tarball distribution for the example plugin in the releases section of this repository.
+The DataIQ Plugin Manager can be used to install these releases into an existing DataIQ installation.
+It can be found at the following path on your DataIQ host, but will be abbreviated in the remainder of this document.
+
+```
+/opt/dataiq/plugin_manager/bin/plugin_manager
+```
+
+Be sure to initialize the plugin manager at least once between DataIQ installs and updates.
+Then you can use it to install and start the release tarball.
+
+```
+plugin_manager init
+plugin_manager install example plugin-centos-base -f <release tar.gz>
+plugin_manager start example
+```
+
 
 ## Local Development
 
-Export an environment variable called `LOCAL_DEV`. This flag will be checked when launching the plugin. If it is set, the plugin will use a "dummy" data source in place of actual ClarityNow API binning data:
+Export an environment variable called `LOCAL_DEV`. 
+This flag will be checked when launching the plugin. 
+If it is set, the plugin will use a "dummy" data source in place of actual ClarityNow API binning data:
 
 ```
 export LOCAL_DEV=true
@@ -22,7 +49,8 @@ Follow the below steps to run the plugin locally for development.
 
 ### Build and run the front end UI
 
-The UI will be built and bundled into `/static/dist/bundle.js`. This `bundle.js` file is what is loaded into the browser for the UI.
+The UI will be built and bundled into `/static/dist/bundle.js`. 
+This `bundle.js` file is what is loaded into the browser for the UI.
 
 1. Go into the `/static` directory.
 2. From the command line, run `npm install`.
@@ -50,21 +78,25 @@ Before packaging the example plugin for use in DataIQ, be sure to unset the `LOC
 unset LOCAL_DEV
 ```
 
-To run the example plugin inside DataIQ it must first be packaged in the way
-that the Plugin Manager is expecting. This is accomplished by running
-`build.sh <version>`, which will generate a tar.gz that can be passed to the plugin manager install command:
-`plugin_manager install example plugin-centos-base -f <build tar.gz>`
+To run the example plugin inside DataIQ it must first be packaged in the way that the Plugin Manager is expecting.
+This is accomplished by running `build.sh <version>`, which will generate a tar.gz that can be passed to the plugin 
+manager install command:
+
+```
+plugin_manager install example plugin-centos-base -f <build tar.gz>
+```
 
 The build tar.gz contains a direct representation of the plugin host storage.
-Every file that the flask application needs to run must be contained here, and
-will be read into the generated plugin container under the `/hoststorage/`
-directory.
+Every file that the flask application needs to run must be contained here, and will be read into the generated plugin
+container under the `/hoststorage/` directory.
 
 Kubernetes will launch the plugin container using `startup.sh`. Use this script
 file to configure any runtime behaviors for the plugin.
 
 After installing, start the plugin with the plugin manager:
-`plugin_manager start example`
+```
+plugin_manager start example
+```
 
 ## Using the Example Plugin in DataIQ
 
