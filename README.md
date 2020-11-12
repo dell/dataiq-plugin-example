@@ -52,7 +52,7 @@ unset LOCAL_DEV
 
 To run the example plugin inside DataIQ it must first be packaged in the way
 that the Plugin Manager is expecting. This is accomplished by running
-`build.sh <version>`, which will generate a tar.gz that can be passed to the
+`build.sh <version>`, which will generate a tar.gz that can be passed to the plugin manager install command:
 `plugin_manager install example plugin-centos-base -f <build tar.gz>`
 
 The build tar.gz contains a direct representation of the plugin host storage.
@@ -62,6 +62,9 @@ directory.
 
 Kubernetes will launch the plugin container using `startup.sh`. Use this script
 file to configure any runtime behaviors for the plugin.
+
+After installing, start the plugin with the plugin manager:
+`plugin_manager start example`
 
 ## Using the Example Plugin in DataIQ
 
