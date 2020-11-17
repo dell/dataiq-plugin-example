@@ -74,5 +74,12 @@ def version():
         return contents
 
 
+@app.route('/internal/settings/version/', methods=['GET'])
+def settings_version():
+    with app.open_resource('../version') as f:
+        contents = f.read()
+        return contents
+
+
 if __name__ == '__main__':
     app.run()

@@ -65,8 +65,25 @@ function App() {
    */
   const [version, setVersion] = useState('');
   useEffect(() => {
-    // Fetch the version from the back end
-    fetch('../../version/', {
+    /**
+     * Fetch the version from the back end.
+     *
+     * Note: We need to do this string parsing becuase DataIQ's UI service sets a base href that
+     * alters our relative routes based on where the plugin window is opened.
+     *
+     * The plugin window launched from the 'execute' call has a different base href compared to the
+     * plugin window launched from the 'settings' call. Since the version string is shown in both
+     * views, we need to accommodate for this.
+     *
+     * Main base href:      https://10.199.194.130/clarity/plugin/DateFilter/jobs/<ident>/
+     * Go up two levels to hit /clarity/plugin/DateFilter/version/ route.
+     *
+     * Settings base href:  https://10.199.194.130/clarity/plugins/DateFilter/settings/
+     * Append /version/ to hit /clarity/plugins/DateFilter/settings/version/ route.
+     */
+    const page = document.getElementById('plugin-example-root').dataset.page;
+    const versionPath = page === 'main' ? '../../version/' : './version/';
+    fetch(versionPath, {
       method: 'GET',
       headers: {
         Authorization: getToken(),
