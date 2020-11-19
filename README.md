@@ -52,6 +52,8 @@ Follow the below steps to run the plugin locally for development.
 The UI will be built and bundled into `/static/dist/bundle.js`. 
 This `bundle.js` file is what is loaded into the browser for the UI.
 
+Note: `node` and `npm` (Node package manager) are required to be installed on your system to develop the front end. `npm` is included with Node. Download and install instructions can be found [here for node on Ubuntu/Debian](https://nodejs.org/en/download/). We recommend the "Latest LTS Version".
+
 1. Go into the `/static` directory.
 2. From the command line, run `npm install`.
    - This will install front end dependencies from the `package.json` "dependencies" block.
