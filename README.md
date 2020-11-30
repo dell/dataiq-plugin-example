@@ -112,6 +112,6 @@ plugin_manager start example
 
 After the plugin is installed, enable the plugin: in the DataIQ UI, select Settings > Data management configuration. In the plugin section, select the  ⋮ (vertical ellipses) icon next to the plugin, and select Enable.
 
-To configure the plugin, select the ⋮ (vertical ellipses) icon next to the plugin, and select `Edit configuration`. This opens the ca.control file, where you can configure your plugins.
+To configure the plugin, select the ⋮ (vertical ellipses) icon next to the plugin, and select `Edit configuration`, and configure your plugin.
 
 To use the plugin, select Data Management > Browse, and select a folder under the root path. (The sample plugin does not support using root path: `/`.) In the Actions side panel, select 'Time Bound'. This shows a new window that displays the data in bins according to how recently the file has been accessed.
