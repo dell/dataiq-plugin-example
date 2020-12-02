@@ -18,7 +18,7 @@ import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import styles, { light, dark, DATAIQ_THEME_KEY, DATAIQ_DAY_THEME_VALUE } from './styles';
 import Main from './Main';
 import Settings from './Settings';
-import { getToken } from '.';
+import { getToken } from './utils';
 
 function App() {
   const classes = styles();
