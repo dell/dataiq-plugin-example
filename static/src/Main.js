@@ -20,7 +20,7 @@ import TreeView from '@material-ui/lab/TreeView';
 import TreeItem from '@material-ui/lab/TreeItem';
 import Typography from '@material-ui/core/Typography';
 import styles from './styles';
-import { getToken } from '.';
+import { getToken } from './utils';
 
 function Main() {
   // Use material-ui's styling functionality
@@ -220,9 +220,11 @@ function Main() {
         nodeId={nodes.id}
         label={
           <div className={classes.labelRoot}>
-            <Typography variant="body2" className={classes.labelText}>
-              {nodes.name}
-            </Typography>
+            <Tooltip title={nodes.name} placement="left">
+              <Typography variant="body2" className={classes.labelText} noWrap>
+                {nodes.name}
+              </Typography>
+            </Tooltip>
             {showCount(nodes) && (
               <Tooltip title="Number of files modified between the two dates" placement="right">
                 <Typography variant="caption" color="inherit">
