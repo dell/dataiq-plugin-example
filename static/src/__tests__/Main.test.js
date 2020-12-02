@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from 'react';
-import { render, waitFor, screen } from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect'
+import { render, waitFor, screen, fireEvent } from '@testing-library/react';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import MomentUtils from '@date-io/moment';
 import Main from '../Main';
@@ -34,8 +33,8 @@ test('renders a Main component', async () => {
     </MuiPickersUtilsProvider>,
   );
 
-  await waitFor(() => expect(screen.getAllByText('From')[0]).toBeInTheDocument());
-  await waitFor(() => expect(screen.getAllByText('To')[0]).toBeInTheDocument());
+  await waitFor(() => expect(screen.queryByTestId('date-picker-from')).toBeInTheDocument());
+  await waitFor(() => expect(screen.queryByTestId('date-picker-to')).toBeInTheDocument());
 
   // 'isLoading' boolean is initially true, so the "Loading..." string should show
   waitFor(() => expect(screen.getAllByText('Loading...')[0]).toBeInTheDocument());
@@ -44,5 +43,20 @@ test('renders a Main component', async () => {
   fetch.mockResponseOnce(JSON.stringify({ path: 'dGVzdC9wYXRoL2hlcmU' }));
 
   // 'isLoading' boolean is set to false after fetching, so the "Loading..." string should be gone
-  waitFor(() => expect(screen.queryByText('Loading...')).not.toBeInTheDocument());
+  await waitFor(() => expect(screen.queryByText('Loading...')).not.toBeInTheDocument());
+
+  // Find our 'To' date picker input
+  const toDateInput = screen.queryByTestId('date-picker-to').querySelectorAll('input')[0];
+
+  // Change 'To' date to be earlier than 'From' date
+  await waitFor(() => fireEvent.change(toDateInput, { target: { value: "12/31/1900" } }));
+
+  // Check error text
+  expect(screen.getAllByText(`Date cannot be earlier than 'From' date`)[0]).toBeInTheDocument();
+
+  // Change 'To' date to be later than today's date
+  await waitFor(() => fireEvent.change(toDateInput, { target: { value: "12/31/9999" } }));
+
+  // Check error text
+  expect(screen.getAllByText('Date cannot be later than today')[0]).toBeInTheDocument();
 });

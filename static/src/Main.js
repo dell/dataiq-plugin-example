@@ -250,7 +250,8 @@ function Main() {
           <Grid item xs={4} className={classes.gridItem}>
             <Grid item xs={12} className={classes.datePicker}>
               <KeyboardDatePicker
-                disableFuture
+                // Add an id for our testing library to easily pick out
+                data-testid="date-picker-from"
                 variant="inline"
                 inputVariant="outlined"
                 label="From"
@@ -258,11 +259,14 @@ function Main() {
                 value={fromDate}
                 InputAdornmentProps={{ position: 'start' }}
                 onChange={(date) => handleFromDateChange(date)}
+                disableFuture
+                maxDateMessage="Date cannot be later than today"
               />
             </Grid>
             <Grid item xs={12} className={classes.datePicker}>
               <KeyboardDatePicker
-                disableFuture
+                // Add an id for our testing library to easily pick out
+                data-testid="date-picker-to"
                 variant="inline"
                 inputVariant="outlined"
                 label="To"
@@ -270,6 +274,10 @@ function Main() {
                 value={toDate}
                 InputAdornmentProps={{ position: 'start' }}
                 onChange={(date) => handleToDateChange(date)}
+                disableFuture
+                maxDateMessage="Date cannot be later than today"
+                minDate={fromDate}
+                minDateMessage="Date cannot be earlier than 'From' date"
               />
             </Grid>
           </Grid>
