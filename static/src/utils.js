@@ -1,3 +1,6 @@
+// Copyright 2020 Dell Inc, or its subsidiaries.
+// SPDX-License-Identifier: Apache-2.0
+
 /**
  * As a plugin, we get the authorization token from DataIQ, the parent window.
  * If this is running locally in development, parent.token() will not exist.
