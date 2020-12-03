@@ -211,7 +211,12 @@ function Main() {
    */
   const renderTree = (nodes) => {
     if (!nodes) {
-      return null;
+      return isLoading ? null : (
+        // Show a message if we're done loading and there is no binning information
+        <div className={classes.loading}>
+          <Typography variant="body2">No data to display.</Typography>
+        </div>
+      );
     }
 
     return (
