@@ -9,11 +9,20 @@ import Main from '../Main';
 
 // Mock document and parent token function
 let spy;
+let mockElement;
+
 beforeAll(() => {
-  spy = jest.spyOn(document, 'getElementById');
+  jest.spyOn(window, 'fetch');
   parent.token = () => {
     return 'Bearer ' + 'TEST TOKEN';
   };
+
+  // Mock where we render our Main component
+  mockElement = document.createElement('div');
+  mockElement.setAttribute('id', 'plugin-example-root');
+  mockElement.dataset.path = 'dGVzdC9wYXRoL2hlcmU';
+  spy = jest.spyOn(document, 'getElementById');
+  spy.mockReturnValue(mockElement);
 });
 
 beforeEach(() => {
@@ -21,11 +30,16 @@ beforeEach(() => {
 });
 
 test('renders a Main component', async () => {
-  let mockElement;
-  mockElement = document.createElement('div');
-  mockElement.setAttribute('id', 'plugin-example-root');
-  mockElement.dataset.path = 'dGVzdC9wYXRoL2hlcmU';
-  spy.mockReturnValue(mockElement);
+  // Mock fetch response for a folder with child folders
+  fetch.mockResolvedValueOnce({
+    ok: true,
+    json: async () => ({
+      paths: [
+        { path: '/test1', bins: [] },
+        { path: '/test1/test2', bins: [] },
+      ],
+    }),
+  });
 
   render(
     <MuiPickersUtilsProvider utils={MomentUtils}>
@@ -33,17 +47,34 @@ test('renders a Main component', async () => {
     </MuiPickersUtilsProvider>,
   );
 
-  await waitFor(() => expect(screen.queryByTestId('date-picker-from')).toBeInTheDocument());
-  await waitFor(() => expect(screen.queryByTestId('date-picker-to')).toBeInTheDocument());
-
   // 'isLoading' boolean is initially true, so the "Loading..." string should show
-  waitFor(() => expect(screen.getAllByText('Loading...')[0]).toBeInTheDocument());
+  expect(screen.getAllByText('Loading...')[0]).toBeInTheDocument();
 
-  // Mock the fetch
-  fetch.mockResponseOnce(JSON.stringify({ path: 'dGVzdC9wYXRoL2hlcmU' }));
+  // Check fetch response after component was mounted
+  await waitFor(() =>
+    expect(fetch).toHaveBeenCalledWith(
+      '../../bins/',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({
+          path: 'test/path/here',
+          depth: 1,
+        }),
+        headers: {
+          Authorization: 'Bearer TEST TOKEN',
+          'Content-Type': 'application/json',
+        },
+      }),
+    ),
+  );
+  expect(fetch).toHaveBeenCalledTimes(1);
+
+  // Verify "From" and "To" date pickers are there
+  expect(screen.queryByTestId('date-picker-from')).toBeInTheDocument();
+  expect(screen.queryByTestId('date-picker-to')).toBeInTheDocument();
 
   // 'isLoading' boolean is set to false after fetching, so the "Loading..." string should be gone
-  await waitFor(() => expect(screen.queryByText('Loading...')).not.toBeInTheDocument());
+  expect(screen.queryByText('Loading...')).toBeNull();
 
   // Find our 'To' date picker input
   const toDateInput = screen.queryByTestId('date-picker-to').querySelectorAll('input')[0];
@@ -59,4 +90,40 @@ test('renders a Main component', async () => {
 
   // Check error text
   expect(screen.getAllByText('Date cannot be later than today')[0]).toBeInTheDocument();
+});
+
+test('renders a Main component when no data is available to display', async () => {
+  // Mock fetch response for an empty folder
+  fetch.mockResolvedValueOnce({
+    ok: true,
+    json: async () => ({ paths: [] }),
+  });
+
+  render(
+    <MuiPickersUtilsProvider utils={MomentUtils}>
+      <Main />
+    </MuiPickersUtilsProvider>,
+  );
+
+  // Check fetch response after component was mounted
+  await waitFor(() =>
+    expect(fetch).toHaveBeenCalledWith(
+      '../../bins/',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({
+          path: 'test/path/here',
+          depth: 1,
+        }),
+        headers: {
+          Authorization: 'Bearer TEST TOKEN',
+          'Content-Type': 'application/json',
+        },
+      }),
+    ),
+  );
+  expect(fetch).toHaveBeenCalledTimes(1);
+
+  // Error string should show
+  expect(screen.getAllByText('No data to display.')[0]).toBeInTheDocument();
 });
