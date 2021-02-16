@@ -1,5 +1,4 @@
-flask
-gunicorn
-PyJWT
-pytest
-python-dateutil
+flask==1.1.2            # BSD (Clause 3)
+gunicorn==20.0.4        # MIT
+pytest==5.4.2           # MIT
+python-dateutil==2.8.1  # Apache 2.0
